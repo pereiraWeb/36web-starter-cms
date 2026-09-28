@@ -1,0 +1,24 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import HeroBackground from '../hero/HeroBackground.astro';
+import type { HomeDocument } from '../../lib/content/home';
+import { toPublicImagePath } from '../../lib/content/images';
+
+interface Props {
+	data: HomeDocument;
+}
+
+const { data } = Astro.props;
+const image = toPublicImagePath(data.image) ?? '';
+---
+
+<HeroBackground
+	align="center"
+	height="360px"
+	title={data.title}
+	description={data.description}
+	image={image}
+	titleField={tinaField(data, 'title')}
+	descriptionField={tinaField(data, 'description')}
+	imageField={tinaField(data, 'image')}
+/>

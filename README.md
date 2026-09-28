@@ -2,6 +2,8 @@
 
 Plantilla de web corporativa hecha con [Astro](https://astro.build). Incluye todas las secciones típicas de una web de empresa (portada, servicios, equipo, testimonios, preguntas frecuentes, contacto...), cada una con **varias variantes visuales** para elegir, y un **formulario de contacto funcional** que envía emails de verdad mediante [Resend](https://resend.com).
 
+El piloto del CMS usa [TinaCMS](https://tina.io) y TinaCloud. Hoy se puede editar en el editor visual el título, la descripción y la fotografía de la portada, y un servicio con su página. El resto del contenido sigue en `src/config/`. Guía de alta: [docs/CMS-SETUP.md](docs/CMS-SETUP.md). Guía para quien edita: [docs/CMS-CLIENTE.md](docs/CMS-CLIENTE.md). Costes, accesos y fallos: [docs/CMS-OPERACION.md](docs/CMS-OPERACION.md).
+
 Todo el contenido (textos, colores, datos de la empresa, menú...) está centralizado en archivos de configuración fáciles de editar, en `src/config/`. **No hace falta tocar el diseño ni el código de los componentes para lanzar tu web** — solo rellenar esos archivos con tus datos reales.
 
 Esta guía explica, paso a paso y sin tecnicismos, cómo convertir este starter en la web real de una empresa.
@@ -164,8 +166,8 @@ Cada sección de la web tiene su propio archivo de configuración en `src/config
 
 | Sección | Archivo |
 |---|---|
-| Portada / hero | `heroContent.ts` |
-| Servicios | `servicesContent.ts` (incluye título, descripción, imagen y texto largo de cada servicio) |
+| Portada / hero | El título, la descripción y la foto de la portada están en `content/pages/home.json` (editor: Inicio). El resto de heroes sigue en `heroContent.ts` |
+| Servicios | `service-one` está en `content/services/service-one.json` (editor: Servicios) y tiene página propia. Los demás servicios de ejemplo siguen en `servicesContent.ts` |
 | Equipo | `teamContent.ts` |
 | Testimonios | `testimonialsContent.ts` |
 | Preguntas frecuentes | `faqContent.ts` |
@@ -222,7 +224,7 @@ Visitante rellena el formulario (ContactForm)
 
 Incluye de serie: validación de todos los campos (nombre, email, teléfono, mensaje), casilla de consentimiento RGPD obligatoria, protección anti-spam (honeypot invisible + límite de envíos por IP), mensajes de error accesibles y página de "gracias" tras el envío (`/thank-you`).
 
-**Para que envíe emails de verdad necesitas una cuenta gratuita en [Resend](https://resend.com)** — es el único servicio externo obligatorio de todo el starter. Sin configurarlo, en tu ordenador (`npm run dev`) el formulario sigue funcionando pero solo simula el envío (lo verás en la consola del terminal); en producción, si falta la clave, el formulario avisará de un error en vez de fingir que se envió.
+**Para que envíe emails de verdad necesitas una cuenta en [Resend](https://resend.com).** Sin configurarlo, en tu ordenador (`npm run dev`) el formulario sigue funcionando pero solo simula el envío (lo verás en la consola del terminal); en producción, si falta la clave, el formulario avisará de un error en vez de fingir que se envió. El editor de contenidos es un servicio aparte (TinaCloud); no guarda los mensajes del formulario.
 
 ### Cómo configurar Resend (5 minutos)
 
@@ -401,8 +403,11 @@ Se configuran en el archivo `.env` (local) o en el panel de Vercel (producción)
 | `PUBLIC_ANALYTICS_DEBUG` | No | Ponla a `true` solo para probar en local (`npm run dev`/`preview`) que GA4/Ads/Meta Pixel cargan correctamente. Déjala vacía el resto del tiempo. |
 | `PUBLIC_GOOGLE_MAPS_API_KEY` | No | El mapa de la página de contacto (`MapEmbed`) funciona sin ella (embed gratuito de Google). Añádela para que use en su lugar la API oficial "Maps Embed API" de Google (ver [sección 6.3](#6-cookies-consentimiento-y-analítica-ga4-google-ads-meta-pixel) y `.env.example`). |
 | `SKIP_CONFIG_GUARD` | No | Ponla a `true` solo para saltarte a propósito el aviso de "faltan datos reales en `business.ts`" que bloquea `npm run build` (ver [sección 13.4](#13-arquitectura-interna-temas-configuración-layouts-y-componentes-compartidos)) — por ejemplo, para un build de demo/staging. |
+| `NEXT_PUBLIC_TINA_CLIENT_ID` | No en local; sí para el editor en producción | Identificador público del proyecto TinaCloud. Se incrusta en `/admin` al construir. No es una clave de escritura. |
+| `TINA_TOKEN` | No en local; sí para el editor en producción | Token de solo lectura de TinaCloud. Solo de build/servidor. No uses el prefijo `PUBLIC_`, `NEXT_PUBLIC_` ni `TINA_PUBLIC_`. |
+| `NEXT_PUBLIC_TINA_BRANCH` | No | Rama de Git opcional. Si se deja vacía, se usa la rama del despliegue o `main`. |
 
-Solo `RESEND_API_KEY` y `CONTACT_FROM_EMAIL` son obligatorias para producción; todo lo demás (incluida la analítica) es opcional y el resto de la web (textos, imágenes, diseño) no necesita ningún otro servicio externo.
+`npm run build` usa los archivos de `content/` si las dos variables de Tina están vacías. Si las dos están definidas, construye el editor contra TinaCloud. Tienen que ir las dos o ninguna. Tina solo lee el archivo `.env`, no `.env.local`. Detalle en [docs/CMS-SETUP.md](docs/CMS-SETUP.md).
 
 ---
 
@@ -413,7 +418,7 @@ Checklist de todo lo que hay que tener/decidir para pasar de "starter de ejemplo
 ### Imprescindible
 
 - [ ] **Un dominio propio** (ej. `miempresa.es`), comprado en cualquier proveedor (Namecheap, GoDaddy, IONOS, OVH, el mismo Vercel, etc.).
-- [ ] **Una cuenta en [Vercel](https://vercel.com)** (gratuita para empezar) para publicar la web — ver [sección 10](#10-cómo-publicar-la-web-vercel).
+- [ ] **Una cuenta en [Vercel](https://vercel.com) en plan Pro o Enterprise** para publicar una web comercial. El plan Hobby es solo para uso personal no comercial ([condiciones de uso justo](https://vercel.com/docs/limits/fair-use-guidelines)). El precio vigente está en [vercel.com/pricing](https://vercel.com/pricing).
 - [ ] **Una cuenta en [Resend](https://resend.com)** con el dominio verificado, para que el formulario de contacto envíe emails de verdad (ver [sección 5](#5-el-formulario-de-contacto-envío-de-emails-reales)).
 - [ ] **Datos reales de la empresa**: nombre comercial, razón social, NIF/CIF, dirección fiscal, email y teléfono de contacto → van en `src/config/business.ts` y en las páginas legales.
 - [ ] **Textos legales reales**: las páginas de `src/pages/legal/` son plantillas incompletas a propósito, con un aviso visible y campos entre corchetes (ej. `[NIF/CIF DE LA EMPRESA]`) — sustitúyelos todos por los datos reales, adaptados a tu país y actividad. Si tienes dudas legales (RGPD, LSSI-CE en España, etc.), consúltalo con una gestoría o abogado — no es algo que el código pueda decidir por ti.
@@ -440,15 +445,16 @@ Checklist de todo lo que hay que tener/decidir para pasar de "starter de ejemplo
 
 ## 10. Cómo publicar la web (Vercel)
 
-Este starter está preparado para desplegarse en [Vercel](https://vercel.com) (el mismo equipo que mantiene Next.js, con plan gratuito más que suficiente para una web corporativa).
+Este starter se despliega en [Vercel](https://vercel.com). Una web de cliente es uso comercial: hace falta plan **Pro o Enterprise**. El plan Hobby no vale para eso.
 
 1. Sube el proyecto a un repositorio de GitHub (o GitLab/Bitbucket).
 2. Entra en [vercel.com](https://vercel.com) → **Add New → Project** → selecciona tu repositorio.
-3. Vercel detecta automáticamente que es un proyecto Astro; no hace falta tocar nada en la configuración de build.
+3. El comando de build del proyecto debe ser `npm run build`. Si `NEXT_PUBLIC_TINA_CLIENT_ID` y `TINA_TOKEN` están definidas, ese comando construye el editor contra TinaCloud. Sin ellas, construye en local desde `content/`.
 4. Antes de darle a "Deploy", ve a **Environment Variables** y añade:
    - `RESEND_API_KEY`
    - `CONTACT_FROM_EMAIL`
    - `CONTACT_TO_EMAIL`
+   - Para el editor: `NEXT_PUBLIC_TINA_CLIENT_ID` y `TINA_TOKEN` (las dos)
    - Opcionalmente, si vas a medir visitas/conversiones: `PUBLIC_GA_MEASUREMENT_ID`, `PUBLIC_GOOGLE_ADS_ID` y/o `PUBLIC_META_PIXEL_ID`.
 5. Haz clic en **Deploy**. En 1-2 minutos tendrás una URL pública tipo `tu-proyecto.vercel.app`.
 6. Ve a **Settings → Domains** y añade tu dominio propio (ej. `miempresa.es`). Vercel te indicará qué registros DNS añadir en tu proveedor de dominio.
@@ -460,9 +466,10 @@ Este starter está preparado para desplegarse en [Vercel](https://vercel.com) (e
 
 | Comando | Qué hace |
 |---|---|
-| `npm run dev` | Arranca el servidor de desarrollo en local (con recarga automática; incluye `/demos`) |
-| `npm run build` | Genera la versión final optimizada (excluye `/demos` por defecto) |
-| `npm run build:with-demos` | Igual que `build`, pero mantiene la galería `/demos` (útil en staging) |
+| `npm run dev` | Arranca Tina en local y el servidor de Astro. El editor está en `/admin` |
+| `npm run build` | Build local desde `content/` si no hay credenciales de TinaCloud; build de TinaCloud si las dos variables están definidas. Excluye `/demos` |
+| `npm run build:cloud` | Exige las dos variables de TinaCloud y construye el editor contra TinaCloud |
+| `npm run build:with-demos` | Igual que `build`, pero mantiene la galería `/demos` |
 | `npm run preview` | Sirve en local el resultado de `npm run build`, para comprobarlo antes de publicar |
 | `npm run check` | Revisa que no haya errores de tipos/código en el proyecto |
 
@@ -479,6 +486,8 @@ Este starter está preparado para desplegarse en [Vercel](https://vercel.com) (e
 - [ ] Lighthouse Mobile en `/`, `/services` y `/contact` sin errores graves de LCP/CLS (ver [sección 16](#16-rendimiento-fuentes-cssjs-y-core-web-vitals))
 - [ ] `LocalBusinessSchema` revisado en `src/pages/index.astro` (bórralo si el negocio no tiene local físico) y cada tipo de página validado en la [Prueba de resultados enriquecidos de Google](https://search.google.com/test/rich-results)
 - [ ] `RESEND_API_KEY`, `CONTACT_FROM_EMAIL` y `CONTACT_TO_EMAIL` configuradas en Vercel
+- [ ] `NEXT_PUBLIC_TINA_CLIENT_ID` y `TINA_TOKEN` configuradas en Vercel si el cliente va a usar el editor
+- [ ] Plan de Vercel Pro o Enterprise (no Hobby) si la web es comercial
 - [ ] Formulario de contacto probado enviando un email real de prueba
 - [ ] Si usas analítica: `PUBLIC_GA_MEASUREMENT_ID`/`PUBLIC_GOOGLE_ADS_ID`/`PUBLIC_META_PIXEL_ID` configuradas en Vercel y probadas aceptando cada categoría de cookies
 - [ ] Dominio propio conectado en Vercel, y sitemap (`/sitemap-index.xml`) enviado a Google Search Console
@@ -665,7 +674,7 @@ El starter está pensado para puntuar bien en Lighthouse / PageSpeed sin trucos 
 
 - **CSS inline**: `astro.config.mjs` fija `build.inlineStylesheets: 'always'`. En un sitio de marketing pequeño evita una petición extra de hoja de estilos; el CSS total sigue siendo de pocas decenas de KB.
 - **CSS no duplicado entre variantes**: `SectionHeading.astro` centraliza el estilo del *eyebrow* y de la descripción muted. Solo las variantes que necesitan un tratamiento distinto (CTA oscuros, pill del hero centrado, tamaños de hero) pasan `eyebrowClass` / `descriptionClass`.
-- **JS mínimo y progresivo**: no hay frameworks de UI en el cliente. Cada componente interactivo (`NavMenu`, `ContactForm`, `CookieConsent`, `BackToTop`, `ConsentGate`) carga su propio `<script>` solo en las páginas que lo usan. El formulario funciona sin JS (`noscript` + `action` real). Analytics no carga nada hasta que hay consentimiento.
+- **JS mínimo en la web pública**: no hay React en las páginas que ve el visitante. Cada componente interactivo (`NavMenu`, `ContactForm`, `CookieConsent`, `BackToTop`, `ConsentGate`) carga su propio `<script>` solo en las páginas que lo usan. El formulario **necesita JavaScript**: sin él, el aviso `<noscript>` muestra el email público y no envía nada, porque `/api/contact` solo acepta JSON. Analytics no carga nada hasta que hay consentimiento. El editor de Tina se sirve aparte, en `/admin`.
 - **Demos fuera de producción**: `src/pages/demos/` se excluye automáticamente de `astro build` (se renombra a `_demos` durante el build). El ítem "Demos" del menú tampoco aparece en builds de producción. En local (`astro dev`) sigue disponible. Para un build de staging con la galería: `npm run build:with-demos` (o `INCLUDE_DEMOS=true`).
 - **Componentes no usados no llegan al bundle**: Astro solo incluye el CSS/JS de los componentes que una página importa. Las 4 variantes de FAQ que no uses en ninguna página real no se sirven. Por eso excluir demos del build importa: eran el único sitio que importaba muchas variantes "de muestra".
 

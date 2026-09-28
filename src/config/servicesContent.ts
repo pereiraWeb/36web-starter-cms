@@ -7,11 +7,16 @@ export interface Service {
   image?: string;
   /** Longer copy shown on the individual service page. */
   content?: string;
+  /** Alt text for `image`. Falls back to the service title when omitted. */
+  imageAlt?: string;
   /** Bullet points shown on the individual service page. */
   features?: string[];
 }
 
 export const services: Service[] = [
+  // The public home card and `/services/service-one` read
+  // `content/services/service-one.json` instead of this object. It stays
+  // here so demo variants that import `services` directly still have a card.
   {
     slug: 'service-one',
     title: 'Service One',

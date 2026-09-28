@@ -5,14 +5,15 @@ export const prerender = true;
 
 /**
  * Generated from `business.siteUrl` so the sitemap URL is always correct
- * without hand-editing a static file. Disallows the internal API route and
- * the demo pages (which should be deleted before launch anyway, but are
- * blocked here as a safety net) and the `/thank-you` conversion page (not
- * content worth ranking).
+ * without hand-editing a static file. Disallows the contact API, the Tina
+ * editor (`/admin`), the visual-editing refresh route, the demo pages and
+ * the `/thank-you` conversion page.
  */
 export const GET: APIRoute = () => {
 	const body = `User-agent: *
 Disallow: /api/
+Disallow: /admin
+Disallow: /tina-island
 Disallow: /demos
 Disallow: /thank-you
 

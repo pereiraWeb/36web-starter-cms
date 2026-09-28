@@ -2,6 +2,8 @@
 import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
+import tina from '@tinacms/astro/integration';
+import { tinaAdminDevRedirect } from '@tinacms/astro/vite';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -145,9 +147,18 @@ export default defineConfig({
       // Keep internal/dev-only routes out of the sitemap even if someone
       // forgets to delete `src/pages/demos/` before launching, and out of
       // the conversion-tracking `/thank-you` page (it's not content to rank).
-      filter: (page) => !page.includes('/demos') && !page.includes('/thank-you'),
+      filter: (page) =>
+        !page.includes('/demos') &&
+        !page.includes('/thank-you') &&
+        !page.includes('/admin') &&
+        !page.includes('/tina-island'),
     }),
     excludeDemosInProduction(),
     productionConfigGuard(),
+    tina(),
   ],
+
+  vite: {
+    plugins: [tinaAdminDevRedirect()],
+  },
 });

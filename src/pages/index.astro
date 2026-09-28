@@ -1,12 +1,18 @@
 ---
 import BusinessLayout from '../layouts/BusinessLayout.astro';
-import HeroBackground from '../components/hero/HeroBackground.astro';
 import { TextImage } from '../components/media';
 import { ServicesGrid } from '../components/services';
 import { TestimonialsGrid } from '../components/testimonials';
 import { CtaCentered } from '../components/cta';
 import LocalBusinessSchema from '../components/seo/LocalBusinessSchema.astro';
-import { business } from '../config/business';
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import HomeHero from '../components/tina/HomeHero.astro';
+import { islands } from '../lib/tina/islands';
+import { getHomeContent } from '../lib/content/home';
+import { listPublishedServices } from '../lib/content/services';
+
+const home = await getHomeContent();
+const publishedServices = await listPublishedServices();
 ---
 
 <BusinessLayout title="Home" description="Welcome to our business website.">
@@ -19,12 +25,11 @@ import { business } from '../config/business';
 		use a more specific schema.org subtype (e.g. "Restaurant", "Dentist").
 	-->
 	<LocalBusinessSchema />
-	<HeroBackground align="center"
-	height="360px"
-	title={business.name}
-	description={business.description} />
+	<TinaIsland name="home" wrapper={islands.home.wrapper} primary>
+		<HomeHero data={home.document} />
+	</TinaIsland>
 	<TextImage  />
-	<ServicesGrid />
+	<ServicesGrid items={publishedServices} />
 	<TestimonialsGrid />
 	<CtaCentered />
 </BusinessLayout>

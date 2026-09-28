@@ -30,6 +30,12 @@ export interface Props extends BackgroundProps {
 	 * page's main hero (e.g. a second `HeroBackground` further down the page).
 	 */
 	priority?: boolean;
+	/** Click-to-edit marker for the visible title. Omitted on pages that are not editable. */
+	titleField?: string;
+	/** Click-to-edit marker for the visible description. */
+	descriptionField?: string;
+	/** Click-to-edit marker for the background photograph. */
+	imageField?: string;
 }
 
 const {
@@ -46,17 +52,20 @@ const {
 	backgroundImage = image,
 	showbutton = true,
 	priority = true,
+	titleField,
+	descriptionField,
+	imageField,
 } = Astro.props;
 
 const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--hero-height': height });
 ---
 
 {priority && backgroundImage && <link rel="preload" as="image" fetchpriority="high" href={backgroundImage} />}
-<section class:list={['hero-bg', `hero-bg--${align}`]} style={style}>
+<section class:list={['hero-bg', `hero-bg--${align}`]} style={style} data-tina-field={imageField}>
 	<div class="hero-bg__overlay" aria-hidden="true"></div>
 	<Container class="hero-bg__inner">
-		<h1 class="hero-bg__title">{title}</h1>
-		<p class="hero-bg__description">{description}</p>
+		<h1 class="hero-bg__title" data-tina-field={titleField}>{title}</h1>
+		<p class="hero-bg__description" data-tina-field={descriptionField}>{description}</p>
 		{(showbutton || secondaryCtaText) && (
 			<div class="hero-bg__actions">
 				{showbutton && <Button href={primaryCtaHref} variant="inverse">{primaryCtaText}</Button>}

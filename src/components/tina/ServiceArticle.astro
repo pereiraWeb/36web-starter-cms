@@ -1,0 +1,123 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import ResponsiveImage from '../media/ResponsiveImage.astro';
+import { servicesContent, type Service } from '../../config/servicesContent';
+import { imageFallbacks } from '../../config/images';
+import type { ServiceDocument } from '../../lib/content/services';
+
+interface Props {
+	service: Service;
+	source?: ServiceDocument | null;
+}
+
+const { service, source = null } = Astro.props;
+const field = (name: 'title' | 'description' | 'body' | 'image' | 'features') =>
+	source ? tinaField(source, name) : undefined;
+---
+
+<div class="single-service">
+	<div class="single-service__media">
+		<ResponsiveImage
+			src={service.image ?? imageFallbacks.photo}
+			alt={service.imageAlt ?? service.title}
+			width={800}
+			height={600}
+			priority
+			field={field('image')}
+		/>
+	</div>
+	<div class="single-service__content">
+		<h1 class="single-service__title" data-tina-field={field('title')}>{service.title}</h1>
+		<p class="single-service__lead" data-tina-field={field('description')}>{service.description}</p>
+		{service.content && <p class="single-service__body" data-tina-field={field('body')}>{service.content}</p>}
+		{service.features && service.features.length > 0 && (
+			<ul class="single-service__features" data-tina-field={field('features')}>
+				{service.features.map((feature) => (
+					<li>
+						<Icon name="check" size={18} />
+						{feature}
+					</li>
+				))}
+			</ul>
+		)}
+		<div class="single-service__actions">
+			<Button href={servicesContent.single.ctaHref}>{servicesContent.single.ctaText}</Button>
+			<Button href="/services" variant="outline">
+				<Icon name="chevron-right" size={16} class="single-service__back-icon" />
+				{servicesContent.single.backText}
+			</Button>
+		</div>
+	</div>
+</div>
+
+<style>
+	.single-service {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--spacing-xl);
+		align-items: center;
+	}
+
+	:global(.single-service__media img) {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		border-radius: calc(var(--radius-base) * 1.5);
+		object-fit: cover;
+	}
+
+	.single-service__title {
+		font-size: clamp(2rem, 4vw, 2.75rem);
+		line-height: 1.2;
+	}
+
+	.single-service__lead {
+		font-size: 1.15rem;
+		color: var(--color-text-muted);
+	}
+
+	.single-service__body {
+		color: var(--color-text-muted);
+	}
+
+	.single-service__features {
+		display: grid;
+		gap: 0.6rem;
+		list-style: none;
+		margin: var(--spacing-md) 0;
+		padding: 0;
+	}
+
+	.single-service__features li {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+
+	.single-service__features :global(.icon) {
+		flex-shrink: 0;
+		color: var(--color-primary);
+	}
+
+	.single-service__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-sm);
+		margin-top: var(--spacing-md);
+	}
+
+	:global(.single-service__back-icon) {
+		transform: rotate(180deg);
+	}
+
+	@media (max-width: 768px) {
+		.single-service {
+			grid-template-columns: 1fr;
+		}
+
+		.single-service__media {
+			order: -1;
+		}
+	}
+</style>
