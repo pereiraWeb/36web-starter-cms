@@ -44,6 +44,7 @@ export interface Props {
 	placeholderLabels?: boolean;
 	class?: string;
 	submitClass?: string;
+	submitField?: string;
 }
 
 const {
@@ -56,6 +57,7 @@ const {
 	placeholderLabels = false,
 	class: className,
 	submitClass,
+	submitField,
 } = Astro.props;
 
 const honeypotId = `${HONEYPOT_FIELD_NAME}-${Math.random().toString(36).slice(2, 8)}`;
@@ -118,7 +120,7 @@ const honeypotId = `${HONEYPOT_FIELD_NAME}-${Math.random().toString(36).slice(2,
 
 	{showConsent && <ConsentCheckbox />}
 	<FormStatus />
-	<Button type="submit" class:list={['contact-form__submit', submitClass]}>
+	<Button type="submit" class:list={['contact-form__submit', submitClass]} field={submitField}>
 		{submitText}
 	</Button>
 	<noscript>

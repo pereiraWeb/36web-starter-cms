@@ -1,7 +1,10 @@
 ---
 import LegalLayout from '../../layouts/LegalLayout.astro';
-import { business } from '../../config/business';
+import { tinaField } from '@tinacms/astro/tina-field';
 import { cookieConsentContent } from '../../config/cookieConsentContent';
+import { getSiteContent } from '../../lib/content/site';
+
+const site = await getSiteContent();
 ---
 
 <LegalLayout
@@ -43,5 +46,5 @@ import { cookieConsentContent } from '../../config/cookieConsentContent';
 		propio navegador. Ten en cuenta que hacerlo puede afectar al funcionamiento de esta y otras webs.
 	</p>
 
-	<p>Cualquier pregunta sobre esta política puede enviarse a {business.email}.</p>
+	<p>Cualquier pregunta sobre esta política puede enviarse a <span data-tina-field={tinaField(site.document, 'email')}>{site.email}</span>.</p>
 </LegalLayout>

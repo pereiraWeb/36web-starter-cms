@@ -1,0 +1,15 @@
+{
+  "heroTitle": "Contact",
+  "heroDescription": "Get in touch with us.",
+  "heroImage": "/img/fallback.webp",
+  "seoTitle": "Contact",
+  "seoDescription": "Get in touch with us.",
+  "title": "Contact",
+  "submitText": "Enviar",
+  "thanks": {
+    "title": "¡Gracias por contactarnos!",
+    "description": "Hemos recibido tu mensaje y te responderemos en el plazo de un día laborable.",
+    "backText": "Volver al inicio",
+    "backHref": "/"
+  }
+}

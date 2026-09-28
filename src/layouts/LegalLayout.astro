@@ -28,8 +28,6 @@ const resolvedHeading = heading ?? title;
 ---
 
 <BusinessLayout {...seoProps}>
-	<slot name="header" slot="header" />
-	<slot name="footer" slot="footer" />
 	<Breadcrumbs items={[{ label: homeLabel, href: '/' }, { label: breadcrumbLabel ?? resolvedHeading }]} />
 	<section>
 		<Container narrow>

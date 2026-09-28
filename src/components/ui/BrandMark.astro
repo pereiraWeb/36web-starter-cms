@@ -19,6 +19,7 @@ export interface Props {
 	variant?: 'light' | 'dark';
 	width?: number;
 	height?: number;
+	field?: string;
 }
 
 const { variant = 'light' } = Astro.props;
@@ -30,6 +31,7 @@ const {
 	fallbackToText = true,
 	width = business.logoWidth ?? 160,
 	height = business.logoHeight ?? 40,
+	field,
 } = Astro.props;
 ---
 
@@ -43,6 +45,7 @@ const {
 			height={height}
 			loading="eager"
 			decoding="async"
+			data-tina-field={field || undefined}
 			data-fallback-src={imageFallbacks.logo !== logo ? imageFallbacks.logo : undefined}
 		/>
 	) : (

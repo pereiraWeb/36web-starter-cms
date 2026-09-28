@@ -1,21 +1,17 @@
 ---
 import BusinessLayout from '../layouts/BusinessLayout.astro';
-import { TextImage } from '../components/media';
-import { ServicesGrid } from '../components/services';
-import { TestimonialsGrid } from '../components/testimonials';
-import { CtaCentered } from '../components/cta';
 import LocalBusinessSchema from '../components/seo/LocalBusinessSchema.astro';
 import TinaIsland from '@tinacms/astro/TinaIsland.astro';
-import HomeHero from '../components/tina/HomeHero.astro';
+import HomePage from '../components/tina/HomePage.astro';
 import { islands } from '../lib/tina/islands';
-import { getHomeContent } from '../lib/content/home';
-import { listPublishedServices } from '../lib/content/services';
+import { getHomePage } from '../lib/content/pages';
+import { getSiteContent } from '../lib/content/site';
 
-const home = await getHomeContent();
-const publishedServices = await listPublishedServices();
+const home = await getHomePage();
+const site = await getSiteContent();
 ---
 
-<BusinessLayout title="Home" description="Welcome to our business website.">
+<BusinessLayout title={home.document.seoTitle} description={home.document.seoDescription}>
 	<!--
 		Only meaningful for businesses with a real physical location customers
 		visit — if this is a purely online business/service, delete this line
@@ -24,12 +20,15 @@ const publishedServices = await listPublishedServices();
 		`src/components/seo/LocalBusinessSchema.astro` for the `type` prop to
 		use a more specific schema.org subtype (e.g. "Restaurant", "Dentist").
 	-->
-	<LocalBusinessSchema />
+	<LocalBusinessSchema
+		name={site.name}
+		email={site.email}
+		phone={site.phone}
+		logo={site.logo}
+		address={site.address}
+		hours={site.hours}
+	/>
 	<TinaIsland name="home" wrapper={islands.home.wrapper} primary>
-		<HomeHero data={home.document} />
+		<HomePage data={home} />
 	</TinaIsland>
-	<TextImage  />
-	<ServicesGrid items={publishedServices} />
-	<TestimonialsGrid />
-	<CtaCentered />
 </BusinessLayout>

@@ -1,22 +1,17 @@
 ---
-import { ServicesShowcase } from '../components/services';
-import { FaqAccordion } from '../components/faq';
-import { faqs } from '../config/faqContent';
-import FaqSchema from '../components/seo/FaqSchema.astro';
-import HeroBackground from '../components/hero/HeroBackground.astro';
 import BusinessLayout from '../layouts/BusinessLayout.astro';
+import FaqSchema from '../components/seo/FaqSchema.astro';
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import ServicesIndex from '../components/tina/ServicesIndex.astro';
+import { islands } from '../lib/tina/islands';
+import { getServicesIndex } from '../lib/content/pages';
+
+const services = await getServicesIndex();
 ---
 
-<BusinessLayout title="Services" description="Discover the services we offer.">
-	<HeroBackground
-		align="center"
-		height="360px"
-		title="Services"
-		description="Discover the services we offer."
-		showbutton={false}
-	/>
-	<ServicesShowcase />
-	<FaqAccordion />
-	<!-- Matches the FAQ content rendered visibly above via `FaqAccordion`. -->
-	<FaqSchema items={faqs} />
+<BusinessLayout title={services.document.seoTitle} description={services.document.seoDescription}>
+	<TinaIsland name="services" wrapper={islands.services.wrapper} primary>
+		<ServicesIndex data={services} />
+	</TinaIsland>
+	<FaqSchema items={services.faqs.map((item) => ({ question: item.question, answer: item.answer }))} />
 </BusinessLayout>

@@ -18,6 +18,11 @@ export interface Props extends BackgroundProps {
 	boxBackgroundImage?: string;
 	/** Any valid CSS length (e.g. "auto", "320px", "50vh"). */
 	height?: string;
+	eyebrowField?: string;
+	titleField?: string;
+	descriptionField?: string;
+	ctaField?: string;
+	secondaryCtaField?: string;
 }
 
 const {
@@ -33,6 +38,11 @@ const {
 	backgroundImage,
 	boxBackgroundColor = 'var(--color-primary)',
 	boxBackgroundImage,
+	eyebrowField,
+	titleField,
+	descriptionField,
+	ctaField,
+	secondaryCtaField,
 } = Astro.props;
 
 const sectionStyle = backgroundStyle({ backgroundColor, backgroundImage }, { '--cta-boxed-height': height });
@@ -49,10 +59,13 @@ const boxStyle = backgroundStyle({ backgroundColor: boxBackgroundColor, backgrou
 				titleClass="cta-boxed__title"
 				description={description}
 				descriptionClass="cta-boxed__description"
+				eyebrowField={eyebrowField}
+				titleField={titleField}
+				descriptionField={descriptionField}
 			/>
 			<div class="cta-boxed__actions">
-				<Button href={ctaHref} variant="inverse" track="cta_click" trackLabel={ctaText}>{ctaText}</Button>
-				{secondaryCtaText && <Button href={secondaryCtaHref} variant="inverse-outline">{secondaryCtaText}</Button>}
+				<Button href={ctaHref} variant="inverse" track="cta_click" trackLabel={ctaText} field={ctaField}>{ctaText}</Button>
+				{secondaryCtaText && <Button href={secondaryCtaHref} variant="inverse-outline" field={secondaryCtaField}>{secondaryCtaText}</Button>}
 			</div>
 		</div>
 	</Container>

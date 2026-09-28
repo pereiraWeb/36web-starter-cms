@@ -5,16 +5,18 @@ export interface Props {
 	eyebrow?: string;
 	/** Wraps the whole card in a link when provided, making the entire card clickable (not just the text). */
 	href?: string;
+	titleField?: string;
+	descriptionField?: string;
 }
 
-const { title, description, eyebrow, href } = Astro.props;
+const { title, description, eyebrow, href, titleField, descriptionField } = Astro.props;
 const Tag = href ? 'a' : 'article';
 ---
 
 <Tag class="card-basic" href={href}>
 	{eyebrow && <span class="card-basic__eyebrow">{eyebrow}</span>}
-	<h3 class="card-basic__title">{title}</h3>
-	<p class="card-basic__description">{description}</p>
+	<h3 class="card-basic__title" data-tina-field={titleField || undefined}>{title}</h3>
+	<p class="card-basic__description" data-tina-field={descriptionField || undefined}>{description}</p>
 </Tag>
 
 <style>

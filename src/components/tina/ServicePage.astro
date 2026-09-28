@@ -1,0 +1,33 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import Section from '../ui/Section.astro';
+import { CtaBoxed } from '../cta';
+import ServiceArticle from './ServiceArticle.astro';
+import type { ServicePageData } from '../../lib/content/pages';
+
+interface Props {
+	data: ServicePageData;
+}
+
+const { data } = Astro.props;
+const { editorial, servicesPage } = data;
+const cta = servicesPage.detailCta!;
+---
+
+<Section>
+	<ServiceArticle service={editorial.service} source={editorial.document} />
+</Section>
+<CtaBoxed
+	eyebrow={cta.eyebrow ?? undefined}
+	title={cta.title}
+	description={cta.description ?? undefined}
+	ctaText={cta.ctaText}
+	ctaHref={cta.ctaHref}
+	secondaryCtaText={cta.secondaryCtaText ?? undefined}
+	secondaryCtaHref={cta.secondaryCtaHref ?? undefined}
+	eyebrowField={tinaField(cta, 'eyebrow')}
+	titleField={tinaField(cta, 'title')}
+	descriptionField={tinaField(cta, 'description')}
+	ctaField={tinaField(cta, 'ctaText')}
+	secondaryCtaField={tinaField(cta, 'secondaryCtaText')}
+/>

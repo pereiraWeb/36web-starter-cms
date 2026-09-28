@@ -1,0 +1,43 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import HeroBackground from '../hero/HeroBackground.astro';
+import ContactSplit from '../contact/ContactSplit.astro';
+import { toPublicImagePath } from '../../lib/content/images';
+import type { ContactPageData } from '../../lib/content/pages';
+
+interface Props {
+	data: ContactPageData;
+}
+
+const { data } = Astro.props;
+const { document, site } = data;
+const place = `${site.address.street}, ${site.address.postalCode} ${site.address.city}, ${site.address.country}`;
+---
+
+<HeroBackground
+	align="center"
+	height="360px"
+	title={document.heroTitle}
+	description={document.heroDescription}
+	image={toPublicImagePath(document.heroImage)}
+	showbutton={false}
+	titleField={tinaField(document, 'heroTitle')}
+	descriptionField={tinaField(document, 'heroDescription')}
+	imageField={tinaField(document, 'heroImage')}
+/>
+<ContactSplit
+	title={document.title}
+	submitText={document.submitText}
+	titleField={tinaField(document, 'title')}
+	submitField={tinaField(document, 'submitText')}
+	email={site.email}
+	emailField={tinaField(site.document, 'email')}
+	phone={site.phone}
+	phoneField={tinaField(site.document, 'phone')}
+	address={site.addressText}
+	addressField={tinaField(site.document, 'address')}
+	hours={site.hoursText}
+	hoursField={tinaField(site.document, 'hours')}
+	mapAddress={place}
+	mapTitle={`Mapa de la ubicación de ${site.name}`}
+/>

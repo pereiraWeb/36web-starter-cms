@@ -1,0 +1,59 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import type { ContactPageData } from '../../lib/content/pages';
+
+interface Props {
+	data: ContactPageData;
+}
+
+const { data } = Astro.props;
+const thanks = data.document.thanks!;
+---
+
+<section class="thank-you">
+	<Container narrow class="thank-you__inner">
+		<span class="thank-you__icon" aria-hidden="true">
+			<Icon name="check" size={32} />
+		</span>
+		<h1 data-tina-field={tinaField(thanks, 'title')}>{thanks.title}</h1>
+		<p data-tina-field={tinaField(thanks, 'description')}>{thanks.description}</p>
+		<Button href={thanks.backHref} field={tinaField(thanks, 'backText')}>{thanks.backText}</Button>
+	</Container>
+</section>
+
+<style>
+	.thank-you {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 60vh;
+		text-align: center;
+	}
+
+	:global(.thank-you__inner) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--spacing-sm);
+	}
+
+	.thank-you__icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 3.5rem;
+		height: 3.5rem;
+		margin-bottom: var(--spacing-xs);
+		border-radius: 50%;
+		background-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
+		color: var(--color-primary);
+	}
+
+	.thank-you p {
+		max-width: 480px;
+		color: var(--color-text-muted);
+	}
+</style>

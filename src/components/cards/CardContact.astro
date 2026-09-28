@@ -12,39 +12,51 @@ import { contactContent } from '../../config/contactContent';
 export interface Props {
 	title?: string;
 	showHours?: boolean;
+	titleField?: string;
+	email?: string;
+	emailField?: string;
+	phone?: string;
+	phoneField?: string;
+	address?: string;
+	addressField?: string;
+	hours?: string;
+	hoursField?: string;
 }
 
-const { title = contactContent.split.title, showHours = true } = Astro.props;
+const {
+	title = contactContent.split.title,
+	showHours = true,
+	titleField,
+	email = business.email,
+	emailField,
+	phone = business.phone,
+	phoneField,
+	address = `${business.address.street}, ${business.address.city}, ${business.address.region} ${business.address.postalCode}, ${business.address.country}`,
+	addressField,
+	hours = business.hours.map((item) => `${item.days}: ${item.hours}`).join(' · '),
+	hoursField,
+} = Astro.props;
 ---
 
 <article class="card-contact">
-	<h3 class="card-contact__title">{title}</h3>
+	<h3 class="card-contact__title" data-tina-field={titleField || undefined}>{title}</h3>
 	<dl class="card-contact__details">
 		<div class="card-contact__row">
 			<dt><Icon name="mail" label={contactContent.split.emailLabel} class="card-contact__icon" /></dt>
-			<dd><a href={`mailto:${business.email}`}>{business.email}</a></dd>
+			<dd data-tina-field={emailField || undefined}><a href={`mailto:${email}`}>{email}</a></dd>
 		</div>
 		<div class="card-contact__row">
 			<dt><Icon name="phone" label={contactContent.split.phoneLabel} class="card-contact__icon" /></dt>
-			<dd><a href={`tel:${business.phone}`}>{business.phone}</a></dd>
+			<dd data-tina-field={phoneField || undefined}><a href={`tel:${phone}`}>{phone}</a></dd>
 		</div>
 		<div class="card-contact__row">
 			<dt><Icon name="map-pin" label={contactContent.split.addressLabel} class="card-contact__icon" /></dt>
-			<dd>
-				{business.address.street}, {business.address.city}, {business.address.region}{' '}
-				{business.address.postalCode}, {business.address.country}
-			</dd>
+			<dd data-tina-field={addressField || undefined}>{address}</dd>
 		</div>
-		{showHours && business.hours.length > 0 && (
+		{showHours && hours && (
 			<div class="card-contact__row">
 				<dt><Icon name="clock" label={contactContent.split.hoursLabel} class="card-contact__icon" /></dt>
-				<dd class="card-contact__hours">
-					{business.hours.map((entry) => (
-						<p>
-							{entry.days}: {entry.hours}
-						</p>
-					))}
-				</dd>
+				<dd class="card-contact__hours" data-tina-field={hoursField || undefined}>{hours}</dd>
 			</div>
 		)}
 	</dl>

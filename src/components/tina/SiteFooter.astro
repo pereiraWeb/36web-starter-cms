@@ -1,0 +1,54 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import { FooterColumns } from '../footer';
+import WhatsappButton from '../ui/WhatsappButton.astro';
+import CookieConsent from '../ui/CookieConsent.astro';
+import type { SiteContent } from '../../lib/content/site';
+
+interface Props {
+	site: SiteContent;
+}
+
+const { site } = Astro.props;
+const { cookies, document } = site;
+const items = site.navigation.map((item) => ({
+	...item,
+	labelField: item.source ? tinaField(item.source, 'label') : undefined,
+}));
+---
+
+<FooterColumns
+	logo={site.logo}
+	logoAlt={site.name}
+	logoField={tinaField(document, 'logo')}
+	tagline={site.tagline}
+	taglineField={tinaField(document, 'tagline')}
+	email={site.email}
+	emailField={tinaField(document, 'email')}
+	phone={site.phone}
+	phoneField={tinaField(document, 'phone')}
+	place={`${site.address.city}, ${site.address.country}`}
+	placeField={tinaField(document, 'address')}
+	social={site.social}
+	items={items}
+	linksHeading={site.footer.linksHeading}
+	contactHeading={site.footer.contactHeading}
+	companyHeading={site.footer.companyHeading}
+	linksHeadingField={tinaField(document.footer, 'linksHeading')}
+	contactHeadingField={tinaField(document.footer, 'contactHeading')}
+	companyHeadingField={tinaField(document.footer, 'companyHeading')}
+/>
+<WhatsappButton phone={site.phone} message={`Hola ${site.name}, tengo una pregunta.`} field={tinaField(document, 'phone')} />
+<CookieConsent
+	banner={cookies}
+	preferences={{
+		title: cookies.preferencesTitle,
+		description: cookies.preferencesDescription,
+		saveText: cookies.saveText,
+	}}
+	titleField={tinaField(document.cookies, 'title')}
+	messageField={tinaField(document.cookies, 'message')}
+	manageField={tinaField(document.cookies, 'manageText')}
+	rejectField={tinaField(document.cookies, 'rejectAllText')}
+	acceptField={tinaField(document.cookies, 'acceptAllText')}
+/>

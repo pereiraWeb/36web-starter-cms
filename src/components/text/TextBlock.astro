@@ -16,6 +16,9 @@ export interface Props extends BackgroundProps {
 	paragraph?: string;
 	align?: 'left' | 'center';
 	class?: string;
+	titleField?: string;
+	descriptionField?: string;
+	paragraphField?: string;
 }
 
 const {
@@ -26,6 +29,9 @@ const {
 	backgroundColor,
 	backgroundImage,
 	class: className,
+	titleField,
+	descriptionField,
+	paragraphField,
 } = Astro.props;
 
 const style = backgroundStyle({ backgroundColor, backgroundImage });
@@ -33,9 +39,9 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 
 <section class:list={['text-block', `text-block--${align}`, className]} style={style}>
 	<Container narrow class="text-block__inner">
-		<h2 class="text-block__title">{title}</h2>
-		{description && <p class="text-block__description">{description}</p>}
-		<p class="text-block__paragraph">{paragraph}</p>
+		<h2 class="text-block__title" data-tina-field={titleField || undefined}>{title}</h2>
+		{description && <p class="text-block__description" data-tina-field={descriptionField || undefined}>{description}</p>}
+		<p class="text-block__paragraph" data-tina-field={paragraphField || undefined}>{paragraph}</p>
 	</Container>
 </section>
 

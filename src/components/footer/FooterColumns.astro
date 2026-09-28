@@ -14,6 +14,20 @@ export interface Props extends BackgroundProps {
 	contactHeading?: string;
 	logo?: string;
 	logoAlt?: string;
+	logoField?: string;
+	tagline?: string;
+	taglineField?: string;
+	email?: string;
+	emailField?: string;
+	phone?: string;
+	phoneField?: string;
+	place?: string;
+	placeField?: string;
+	items?: Array<import('../../config/navigation').NavItem & { labelField?: string }>;
+	linksHeadingField?: string;
+	contactHeadingField?: string;
+	companyHeadingField?: string;
+	social?: import('../../config/business').BusinessSocialLinks;
 }
 
 const {
@@ -22,12 +36,26 @@ const {
 	contactHeading = footerContent.columns.contactHeading,
 	logo = business.logo,
 	logoAlt = business.name,
+	logoField,
+	tagline = business.tagline,
+	taglineField,
+	email = business.email,
+	emailField,
+	phone = business.phone,
+	phoneField,
+	place = `${business.address.city}, ${business.address.country}`,
+	placeField,
+	linksHeadingField,
+	contactHeadingField,
+	companyHeadingField,
+	social = business.social,
 	backgroundColor,
 	backgroundImage,
 } = Astro.props;
 
+const items = (Astro.props.items ?? mainNavigation) as NonNullable<Props['items']>;
 const year = new Date().getFullYear();
-const socialLinks = Object.entries(business.social).filter(([, href]) => href);
+const socialLinks = Object.entries(social).filter(([, href]) => href);
 const style = backgroundStyle({ backgroundColor, backgroundImage });
 ---
 
@@ -35,28 +63,28 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 	<Container class="footer-columns__grid">
 		<div>
 			<a href="/" class="footer-columns__brand">
-				<BrandMark logo={logo} logoAlt={logoAlt} class="footer-columns__logo" />
+				<BrandMark logo={logo} logoAlt={logoAlt} class="footer-columns__logo" field={logoField} />
 			</a>
-			<p class="footer-columns__tagline">{business.tagline}</p>
+			<p class="footer-columns__tagline" data-tina-field={taglineField || undefined}>{tagline}</p>
 		</div>
 		<div>
-			<h3>{linksHeading}</h3>
+			<h3 data-tina-field={linksHeadingField || undefined}>{linksHeading}</h3>
 			<ul>
-				{mainNavigation.map((item) => (
-					<li><a href={item.href}>{item.label}</a></li>
+				{items.map((item) => (
+					<li><a href={item.href} data-tina-field={item.labelField || undefined}>{item.label}</a></li>
 				))}
 			</ul>
 		</div>
 		<div>
-			<h3>{contactHeading}</h3>
+			<h3 data-tina-field={contactHeadingField || undefined}>{contactHeading}</h3>
 			<ul class="footer-columns__contact">
-				<li>{business.email}</li>
-				<li>{business.phone}</li>
-				<li>{business.address.city}, {business.address.country}</li>
+				<li data-tina-field={emailField || undefined}>{email}</li>
+				<li data-tina-field={phoneField || undefined}>{phone}</li>
+				<li data-tina-field={placeField || undefined}>{place}</li>
 			</ul>
 		</div>
 		<div>
-			<h3>{companyHeading}</h3>
+			<h3 data-tina-field={companyHeadingField || undefined}>{companyHeading}</h3>
 			{socialLinks.length > 0 ? (
 				<ul class="footer-columns__social">
 					{socialLinks.map(([label, href]) => (

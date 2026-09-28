@@ -1,0 +1,54 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import HeroBackground from '../hero/HeroBackground.astro';
+import ServicesShowcase from '../services/ServicesShowcase.astro';
+import FaqAccordion from '../faq/FaqAccordion.astro';
+import { toPublicImagePath } from '../../lib/content/images';
+import type { ServicesIndexData } from '../../lib/content/pages';
+
+interface Props {
+	data: ServicesIndexData;
+}
+
+const { data } = Astro.props;
+const { document, services, faqs } = data;
+---
+
+<HeroBackground
+	align="center"
+	height="360px"
+	title={document.heroTitle}
+	description={document.heroDescription}
+	image={toPublicImagePath(document.heroImage)}
+	showbutton={false}
+	titleField={tinaField(document, 'heroTitle')}
+	descriptionField={tinaField(document, 'heroDescription')}
+	imageField={tinaField(document, 'heroImage')}
+/>
+<ServicesShowcase
+	eyebrow={document.eyebrow ?? undefined}
+	title={document.title}
+	description={document.description ?? ''}
+	ctaText={document.ctaText}
+	eyebrowField={tinaField(document, 'eyebrow')}
+	titleField={tinaField(document, 'title')}
+	descriptionField={tinaField(document, 'description')}
+	ctaField={tinaField(document, 'ctaText')}
+	items={services.map(({ service, document: source }) => ({
+		...service,
+		titleField: tinaField(source, 'title'),
+		descriptionField: tinaField(source, 'description'),
+		imageField: tinaField(source, 'image'),
+	}))}
+/>
+<FaqAccordion
+	title={document.faqTitle}
+	description=""
+	titleField={tinaField(document, 'faqTitle')}
+	items={faqs.map((item) => ({
+		question: item.question,
+		answer: item.answer,
+		questionField: tinaField(item, 'question'),
+		answerField: tinaField(item, 'answer'),
+	}))}
+/>

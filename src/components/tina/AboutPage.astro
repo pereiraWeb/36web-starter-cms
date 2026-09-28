@@ -1,0 +1,70 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import HeroBackground from '../hero/HeroBackground.astro';
+import TextImage from '../media/TextImage.astro';
+import TextBlock from '../text/TextBlock.astro';
+import TeamGrid from '../team/TeamGrid.astro';
+import { toPublicImagePath } from '../../lib/content/images';
+import type { AboutPageData } from '../../lib/content/pages';
+
+interface Props {
+	data: AboutPageData;
+}
+
+const { data } = Astro.props;
+const { document, team } = data;
+const story = document.story!;
+const text = document.text!;
+---
+
+<HeroBackground
+	align="center"
+	height="360px"
+	title={document.heroTitle}
+	description={document.heroDescription}
+	image={toPublicImagePath(document.heroImage)}
+	showbutton={false}
+	titleField={tinaField(document, 'heroTitle')}
+	descriptionField={tinaField(document, 'heroDescription')}
+	imageField={tinaField(document, 'heroImage')}
+/>
+<TextImage
+	reverse
+	height="auto"
+	eyebrow={story.eyebrow ?? undefined}
+	title={story.title}
+	description={story.description}
+	ctaText={story.ctaText ?? undefined}
+	ctaHref={story.ctaHref ?? undefined}
+	image={toPublicImagePath(story.image)}
+	imageAlt={story.imageAlt}
+	eyebrowField={tinaField(story, 'eyebrow')}
+	titleField={tinaField(story, 'title')}
+	descriptionField={tinaField(story, 'description')}
+	ctaField={tinaField(story, 'ctaText')}
+	imageField={tinaField(story, 'image')}
+/>
+<TextBlock
+	align="center"
+	title={text.title ?? undefined}
+	description={text.description ?? undefined}
+	paragraph={text.paragraph ?? undefined}
+	titleField={tinaField(text, 'title')}
+	descriptionField={tinaField(text, 'description')}
+	paragraphField={tinaField(text, 'paragraph')}
+/>
+<TeamGrid
+	title={document.teamTitle}
+	description=""
+	titleField={tinaField(document, 'teamTitle')}
+	members={team.map((member) => ({
+		name: member.name,
+		role: member.role,
+		bio: member.bio ?? undefined,
+		image: toPublicImagePath(member.image),
+		nameField: tinaField(member, 'name'),
+		roleField: tinaField(member, 'role'),
+		bioField: tinaField(member, 'bio'),
+		imageField: tinaField(member, 'image'),
+	}))}
+/>

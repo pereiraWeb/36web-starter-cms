@@ -10,9 +10,12 @@ export interface Props {
 	avatar?: string;
 	/** 1-5 star rating. Omit to hide. */
 	rating?: number;
+	quoteField?: string;
+	authorField?: string;
+	roleField?: string;
 }
 
-const { quote, author, role, avatar = imageFallbacks.photo, rating } = Astro.props;
+const { quote, author, role, avatar = imageFallbacks.photo, rating, quoteField, authorField, roleField } = Astro.props;
 ---
 
 <article class="card-testimonial">
@@ -23,12 +26,12 @@ const { quote, author, role, avatar = imageFallbacks.photo, rating } = Astro.pro
 			))}
 		</div>
 	)}
-	<p class="card-testimonial__quote">&ldquo;{quote}&rdquo;</p>
+	<p class="card-testimonial__quote" data-tina-field={quoteField || undefined}>&ldquo;{quote}&rdquo;</p>
 	<div class="card-testimonial__author">
 		<ResponsiveImage class="card-testimonial__avatar" src={avatar} alt={author} width={44} height={44} />
 		<div>
-			<p class="card-testimonial__name">{author}</p>
-			{role && <p class="card-testimonial__role">{role}</p>}
+			<p class="card-testimonial__name" data-tina-field={authorField || undefined}>{author}</p>
+			{role && <p class="card-testimonial__role" data-tina-field={roleField || undefined}>{role}</p>}
 		</div>
 	</div>
 </article>

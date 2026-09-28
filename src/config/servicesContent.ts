@@ -8,9 +8,11 @@ export interface Service {
   /** Longer copy shown on the individual service page. */
   content?: string;
   /** Alt text for `image`. Falls back to the service title when omitted. */
-  imageAlt?: string;
-  /** Bullet points shown on the individual service page. */
-  features?: string[];
+	imageAlt?: string;
+	/** Bullet points shown on the individual service page. */
+	features?: string[];
+	/** Lower numbers appear first on the public site. */
+	order?: number;
 }
 
 export const services: Service[] = [

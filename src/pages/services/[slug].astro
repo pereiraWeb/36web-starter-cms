@@ -1,43 +1,23 @@
 ---
 import ServiceLayout from '../../layouts/ServiceLayout.astro';
-import Section from '../../components/ui/Section.astro';
-import { CtaBoxed } from '../../components/cta';
 import TinaIsland from '@tinacms/astro/TinaIsland.astro';
-import ServiceArticle from '../../components/tina/ServiceArticle.astro';
-import { services } from '../../config/servicesContent';
-import { getEditorialService, getServiceRoutes } from '../../lib/content/services';
+import ServicePage from '../../components/tina/ServicePage.astro';
+import { getServicePage } from '../../lib/content/pages';
+import { getServiceRoutes } from '../../lib/content/services';
 import { islands } from '../../lib/tina/islands';
 
 export async function getStaticPaths() {
 	const routes = await getServiceRoutes();
 	return routes.map((route) => ({
 		params: { slug: route.slug },
-		props: { editorial: route.editorial },
 	}));
 }
 
-interface Props {
-	editorial: boolean;
-}
-
-const { editorial } = Astro.props;
 const slug = Astro.params.slug ?? '';
-const editorialService = editorial ? await getEditorialService(slug) : null;
-const service = editorialService?.service ?? services.find((item) => item.slug === slug);
-
-if (!service) {
-	throw new Error(`Build detenido: no hay contenido para /services/${slug}.`);
-}
+const page = await getServicePage(slug);
 ---
-<ServiceLayout service={service}>
-	<Section>
-		{editorialService ? (
-			<TinaIsland name="service" wrapper={islands.service.wrapper} params={{ slug }} primary>
-				<ServiceArticle service={service} source={editorialService.document} />
-			</TinaIsland>
-		) : (
-			<ServiceArticle service={service} />
-		)}
-	</Section>
-	<CtaBoxed />
+<ServiceLayout service={page.editorial.service} servicesLabel="Services">
+	<TinaIsland name="service" wrapper={islands.service.wrapper} params={{ slug }} primary>
+		<ServicePage data={page} />
+	</TinaIsland>
 </ServiceLayout>

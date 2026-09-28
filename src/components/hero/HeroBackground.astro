@@ -36,6 +36,8 @@ export interface Props extends BackgroundProps {
 	descriptionField?: string;
 	/** Click-to-edit marker for the background photograph. */
 	imageField?: string;
+	/** Click-to-edit marker for the primary button label. */
+	buttonField?: string;
 }
 
 const {
@@ -55,6 +57,7 @@ const {
 	titleField,
 	descriptionField,
 	imageField,
+	buttonField,
 } = Astro.props;
 
 const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--hero-height': height });
@@ -68,7 +71,7 @@ const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--hero-he
 		<p class="hero-bg__description" data-tina-field={descriptionField}>{description}</p>
 		{(showbutton || secondaryCtaText) && (
 			<div class="hero-bg__actions">
-				{showbutton && <Button href={primaryCtaHref} variant="inverse">{primaryCtaText}</Button>}
+				{showbutton && <Button href={primaryCtaHref} variant="inverse" field={buttonField}>{primaryCtaText}</Button>}
 				{secondaryCtaText && <Button href={secondaryCtaHref} variant="inverse-outline">{secondaryCtaText}</Button>}
 			</div>
 		)}

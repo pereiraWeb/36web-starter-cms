@@ -1,16 +1,15 @@
 ---
 import BusinessLayout from '../layouts/BusinessLayout.astro';
-import HeroBackground from '../components/hero/HeroBackground.astro';
-import ContactSplit from '../components/contact/ContactSplit.astro';
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import ContactPage from '../components/tina/ContactPage.astro';
+import { islands } from '../lib/tina/islands';
+import { getContactPage } from '../lib/content/pages';
+
+const contact = await getContactPage();
 ---
 
-<BusinessLayout title="Contact" description="Get in touch with us.">
-	<HeroBackground
-		align="center"
-		height="360px"
-		title="Contact"
-		description="Get in touch with us."
-		showbutton={false}
-	/>
-	<ContactSplit />
+<BusinessLayout title={contact.document.seoTitle} description={contact.document.seoDescription}>
+	<TinaIsland name="contact" wrapper={islands.contact.wrapper} primary>
+		<ContactPage data={contact} />
+	</TinaIsland>
 </BusinessLayout>

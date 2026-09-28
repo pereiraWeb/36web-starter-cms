@@ -1,0 +1,22 @@
+{
+  "heroTitle": "About Us",
+  "heroDescription": "Learn more about our team and our story.",
+  "heroImage": "/img/fallback.webp",
+  "seoTitle": "About Us",
+  "seoDescription": "Learn more about our team and our story.",
+  "story": {
+    "eyebrow": "Our story",
+    "title": "Built around real people, not templates",
+    "description": "Every project starts with a conversation. We combine design, strategy and a bit of stubbornness to build things our clients are proud to show off.",
+    "ctaText": "Meet the team",
+    "ctaHref": "#team",
+    "image": "/img/fallback.webp",
+    "imageAlt": "Built around real people, not templates"
+  },
+  "text": {
+    "title": "Lorem ipsum dolor sit amet",
+    "description": "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "paragraph": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat. Cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  },
+  "teamTitle": "Our Team"
+}

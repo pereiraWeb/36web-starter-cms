@@ -1,6 +1,6 @@
 import { requestWithMetadata } from '@tinacms/astro';
 import client from '../../../tina/__generated__/client';
-import type { HomeQuery, ServiceConnectionQuery, ServiceQuery } from '../../../tina/__generated__/types';
+import type { AboutQuery, ContactQuery, HomeQuery, ServiceConnectionQuery, ServiceQuery, ServicesPageQuery, SiteQuery } from '../../../tina/__generated__/types';
 
 const HOME_PATH = 'home.json';
 
@@ -56,5 +56,101 @@ export async function loadServiceList() {
 	} catch (error) {
 		throw cmsReadError('el listado de servicios (content/services/)', error);
 	}
-	return raw.data.serviceConnection.edges ?? [];
+	const enriched = await requestWithMetadata(raw);
+	return enriched.data.serviceConnection.edges ?? [];
+}
+
+type TinaResult<TData> = { data: TData; query: string; variables: Record<string, unknown> };
+
+async function readDocument<TData>(
+	what: string,
+	load: () => Promise<TinaResult<TData>>,
+	present: (data: TData) => unknown,
+	priority?: 'primary',
+) {
+	let raw: TinaResult<TData>;
+	try {
+		raw = await load();
+	} catch (error) {
+		throw cmsReadError(what, error);
+	}
+	if (!present(raw.data)) {
+		throw new Error(`Build detenido: no existe ${what}.`);
+	}
+	return requestWithMetadata(raw, priority ? { priority } : undefined);
+}
+
+export function loadSite() {
+	return readDocument(
+		'los datos del negocio (content/site/business.json)',
+		() => client.queries.site({ relativePath: 'business.json' }),
+		(data: SiteQuery) => data.site,
+	);
+}
+
+export function loadAbout() {
+	return readDocument(
+		'la página Nosotros (content/pages/about.json)',
+		() => client.queries.about({ relativePath: 'about.json' }),
+		(data: AboutQuery) => data.about,
+		'primary',
+	);
+}
+
+export function loadContact() {
+	return readDocument(
+		'la página Contacto (content/pages/contact.json)',
+		() => client.queries.contact({ relativePath: 'contact.json' }),
+		(data: ContactQuery) => data.contact,
+		'primary',
+	);
+}
+
+export function loadServicesPage(priority?: 'primary') {
+	return readDocument(
+		'la página de servicios (content/pages/services.json)',
+		() => client.queries.servicesPage({ relativePath: 'services.json' }),
+		(data: ServicesPageQuery) => data.servicesPage,
+		priority,
+	);
+}
+
+function readOrder(value: unknown): number {
+	return typeof value === 'number' ? value : 0;
+}
+
+function sortByOrder<T>(items: T[]): T[] {
+	return [...items].sort(
+		(a, b) => readOrder((a as { order?: unknown }).order) - readOrder((b as { order?: unknown }).order),
+	);
+}
+
+export async function loadTeamList() {
+	try {
+		const raw = await requestWithMetadata(await client.queries.teamConnection());
+		const nodes = (raw.data.teamConnection.edges ?? []).flatMap((edge) => (edge?.node ? [edge.node] : []));
+		return sortByOrder(nodes);
+	} catch (error) {
+		throw cmsReadError('el equipo (content/team/)', error);
+	}
+}
+
+export async function loadTestimonialList() {
+	try {
+		const raw = await requestWithMetadata(await client.queries.testimonialConnection());
+		const nodes = (raw.data.testimonialConnection.edges ?? []).flatMap((edge) => (edge?.node ? [edge.node] : []));
+		return sortByOrder(nodes);
+	} catch (error) {
+		throw cmsReadError('las opiniones (content/testimonials/)', error);
+	}
+}
+
+export async function loadFaqList() {
+	try {
+		const raw = await requestWithMetadata(await client.queries.faqConnection());
+		const nodes = (raw.data.faqConnection.edges ?? []).flatMap((edge) => (edge?.node ? [edge.node] : []));
+		return sortByOrder(nodes);
+	} catch (error) {
+		throw cmsReadError('las preguntas (content/faq/)', error);
+	}
 }

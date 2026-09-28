@@ -1,0 +1,62 @@
+{
+  "name": "Business Name",
+  "legalName": "Business Name S.L.",
+  "tagline": "A short tagline describing the business",
+  "description": "Generic business description used as a fallback for SEO metadata.",
+  "email": "info@example.com",
+  "phone": "+1 234 567 890",
+  "logo": "/logos/logo-fallback.svg",
+  "address": {
+    "street": "Main Street 123",
+    "city": "City",
+    "region": "Region",
+    "postalCode": "00000",
+    "country": "Country"
+  },
+  "hours": [
+    {
+      "days": "Monday - Friday",
+      "hours": "9:00 - 18:00"
+    }
+  ],
+  "social": {
+    "facebook": "",
+    "instagram": "",
+    "linkedin": "",
+    "twitter": ""
+  },
+  "navigation": [
+    {
+      "label": "Hola",
+      "href": "/"
+    },
+    {
+      "label": "Services",
+      "href": "/services"
+    },
+    {
+      "label": "About Us",
+      "href": "/about"
+    },
+    {
+      "label": "Contact",
+      "href": "/contact"
+    }
+  ],
+  "footer": {
+    "linksHeading": "Links",
+    "contactHeading": "Contact",
+    "companyHeading": "Company"
+  },
+  "cookies": {
+    "title": "Tu privacidad",
+    "message": "Usamos cookies propias y de terceros para el funcionamiento básico de la web y, solo si lo aceptas, para medir el tráfico y mostrar contenido de servicios externos (mapas, vídeos, anuncios).",
+    "acceptAllText": "Aceptar todo",
+    "rejectAllText": "Rechazar todo",
+    "manageText": "Configurar",
+    "policyText": "Más información",
+    "preferencesTitle": "Preferencias de privacidad",
+    "preferencesDescription": "Elige qué categorías de cookies quieres permitir. Puedes cambiar esta decisión cuando quieras desde el enlace \"Gestionar cookies\" del pie de página.",
+    "saveText": "Guardar preferencias"
+  }
+}

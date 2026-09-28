@@ -1,25 +1,43 @@
 ---
 import { business } from '../../config/business';
+import type { BusinessSocialLinks } from '../../config/business';
 
 /**
  * Site-wide `Organization` JSON-LD, identifying the publisher behind every
- * page. Rendered once, globally, by `BusinessLayout.astro` — safe and
- * recommended for any business, local or not. For businesses with a real
- * physical location customers visit, also add `LocalBusinessSchema.astro`
- * (see `src/pages/index.astro` for an example).
+ * page. Rendered once, globally, by `BusinessLayout.astro`.
  */
-const sameAs = Object.values(business.social).filter((url): url is string => Boolean(url));
+export interface Props {
+	name?: string;
+	legalName?: string;
+	description?: string;
+	email?: string;
+	phone?: string;
+	logo?: string;
+	social?: BusinessSocialLinks;
+}
+
+const {
+	name = business.name,
+	legalName = business.legalName,
+	description = business.description,
+	email = business.email,
+	phone = business.phone,
+	logo = business.logo,
+	social = business.social,
+} = Astro.props;
+
+const sameAs = Object.values(social).filter((url): url is string => Boolean(url));
 
 const jsonLd = {
 	'@context': 'https://schema.org',
 	'@type': 'Organization',
-	name: business.name,
-	legalName: business.legalName,
+	name,
+	legalName,
 	url: business.siteUrl,
-	logo: business.logo ? new URL(business.logo, business.siteUrl).toString() : undefined,
-	description: business.description,
-	email: business.email,
-	telephone: business.phone,
+	logo: logo ? new URL(logo, business.siteUrl).toString() : undefined,
+	description,
+	email,
+	telephone: phone,
 	...(sameAs.length > 0 ? { sameAs } : {}),
 };
 ---

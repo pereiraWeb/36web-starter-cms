@@ -9,6 +9,8 @@ export interface Props extends BackgroundProps {
 	eyebrow?: string;
 	title?: string;
 	description?: string;
+	members?: Array<{ name: string; role: string; bio?: string; image?: string; nameField?: string; roleField?: string; bioField?: string; imageField?: string }>;
+	titleField?: string;
 }
 
 const {
@@ -17,7 +19,10 @@ const {
 	description = teamContent.grid.description,
 	backgroundColor,
 	backgroundImage,
+	titleField,
 } = Astro.props;
+
+const members = (Astro.props.members ?? team) as NonNullable<Props['members']>;
 
 const style = backgroundStyle({ backgroundColor, backgroundImage });
 ---
@@ -25,16 +30,21 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 <section class="team-grid" style={style}>
 	<Container>
 		<div class="team-grid__header">
-			<SectionHeading
-				eyebrow={eyebrow}
-				title={title}
-				description={description}
-			/>
+			<SectionHeading eyebrow={eyebrow} title={title} description={description} titleField={titleField} />
 		</div>
 		<ul class="team-grid__list">
-			{team.map((member) => (
+			{members.map((member) => (
 				<li>
-					<CardProfile name={member.name} role={member.role} bio={member.bio} image={member.image} />
+					<CardProfile
+						name={member.name}
+						role={member.role}
+						bio={member.bio}
+						image={member.image}
+						nameField={member.nameField}
+						roleField={member.roleField}
+						bioField={member.bioField}
+						imageField={member.imageField}
+					/>
 				</li>
 			))}
 		</ul>

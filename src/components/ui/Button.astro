@@ -20,6 +20,8 @@ export interface Props {
 	track?: 'cta_click' | 'whatsapp_click' | 'phone_click' | 'email_click';
 	/** Optional context sent alongside `track`, e.g. the button's own text. */
 	trackLabel?: string;
+	/** Click-to-edit marker. Omitted outside the visual editor. */
+	field?: string;
 }
 
 const {
@@ -33,6 +35,7 @@ const {
 	rel,
 	track,
 	trackLabel,
+	field,
 } = Astro.props;
 
 const classes = ['btn', `btn--${variant}`, `btn--${size}`, fullWidth && 'btn--full', className];
@@ -47,11 +50,12 @@ const classes = ['btn', `btn--${variant}`, `btn--${size}`, fullWidth && 'btn--fu
 			rel={target === '_blank' ? (rel ?? 'noopener noreferrer') : rel}
 			data-track-event={track}
 			data-track-label={trackLabel}
+			data-tina-field={field || undefined}
 		>
 			<slot />
 		</a>
 	) : (
-		<button class:list={classes} type={type} data-track-event={track} data-track-label={trackLabel}>
+		<button class:list={classes} type={type} data-track-event={track} data-track-label={trackLabel} data-tina-field={field || undefined}>
 			<slot />
 		</button>
 	)

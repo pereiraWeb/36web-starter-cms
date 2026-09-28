@@ -1,4 +1,4 @@
-import { services as configServices, type Service } from '../../config/servicesContent';
+import { type Service } from '../../config/servicesContent';
 import type { ServiceQuery } from '../../../tina/__generated__/types';
 import { toPublicImagePath } from './images';
 import { loadService, loadServiceList } from '../tina/data';
@@ -28,6 +28,9 @@ function toService(slug: string, document: ServiceDocument | null | undefined): 
 		image,
 		imageAlt,
 		features,
+		order: typeof (document as { order?: unknown } | null | undefined)?.order === 'number'
+			? (document as { order: number }).order
+			: 0,
 	};
 }
 
@@ -58,30 +61,22 @@ export async function listEditorialServices(): Promise<EditorialService[]> {
 		items.push({ service, document });
 	}
 
-	return items;
+	return items.sort((a, b) => (a.service.order ?? 0) - (b.service.order ?? 0));
 }
 
 /**
- * Published service list: editorial JSON replaces a config entry with the
- * same slug, and new editorial files are appended. Demo components that
- * import `services` directly are unchanged.
+ * Published services come from `content/services/`. The number in `order`
+ * decides the sequence. Demo components that import `services` from config
+ * are unchanged.
  */
 export async function listPublishedServices(): Promise<Service[]> {
 	const editorial = await listEditorialServices();
-	const bySlug = new Map(editorial.map((item) => [item.service.slug, item.service]));
-	const configSlugs = new Set(configServices.map((service) => service.slug));
-
-	return [
-		...configServices.map((service) => bySlug.get(service.slug) ?? service),
-		...editorial.map((item) => item.service).filter((service) => !configSlugs.has(service.slug)),
-	];
+	return editorial
+		.map((item) => item.service)
+		.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
 export async function getServiceRoutes(): Promise<Array<{ slug: string; editorial: boolean }>> {
-	const published = await listPublishedServices();
-	const editorialSlugs = new Set((await listEditorialServices()).map((item) => item.service.slug));
-	return published.map((service) => ({
-		slug: service.slug,
-		editorial: editorialSlugs.has(service.slug),
-	}));
+	const editorial = await listEditorialServices();
+	return editorial.map((item) => ({ slug: item.service.slug, editorial: true }));
 }

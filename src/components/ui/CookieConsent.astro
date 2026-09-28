@@ -14,34 +14,43 @@ export interface Props {
 	/** Any valid CSS color. Defaults to `var(--color-primary)`. */
 	color?: string;
 	class?: string;
+	banner?: Partial<typeof cookieConsentContent.banner>;
+	preferences?: Partial<typeof cookieConsentContent.preferences>;
+	titleField?: string;
+	messageField?: string;
+	manageField?: string;
+	rejectField?: string;
+	acceptField?: string;
 }
 
-const { color = 'var(--color-primary)', class: className } = Astro.props;
+const { color = 'var(--color-primary)', class: className, titleField, messageField, manageField, rejectField, acceptField } = Astro.props;
+const banner = { ...cookieConsentContent.banner, ...Astro.props.banner };
+const preferences = { ...cookieConsentContent.preferences, ...Astro.props.preferences };
 const style = `--cookie-consent-color: ${color};`;
 ---
 
 <div class:list={['cookie-consent', className]} style={style}>
-	<div class="cookie-consent__banner" data-cookie-banner role="dialog" aria-label={cookieConsentContent.banner.title} hidden>
+	<div class="cookie-consent__banner" data-cookie-banner role="dialog" aria-label={banner.title} hidden>
 		<div class="cookie-consent__banner-text">
-			<p class="cookie-consent__title">{cookieConsentContent.banner.title}</p>
-			<p class="cookie-consent__message">
-				{cookieConsentContent.banner.message}{' '}
-				{cookieConsentContent.banner.policyText && cookieConsentContent.banner.policyHref && (
-					<a href={cookieConsentContent.banner.policyHref} class="cookie-consent__link">
-						{cookieConsentContent.banner.policyText}
+			<p class="cookie-consent__title" data-tina-field={titleField || undefined}>{banner.title}</p>
+			<p class="cookie-consent__message" data-tina-field={messageField || undefined}>
+				{banner.message}{' '}
+				{banner.policyText && banner.policyHref && (
+					<a href={banner.policyHref} class="cookie-consent__link">
+						{banner.policyText}
 					</a>
 				)}
 			</p>
 		</div>
 		<div class="cookie-consent__actions">
-			<button type="button" class="cookie-consent__btn cookie-consent__btn--ghost" data-cookie-manage>
-				{cookieConsentContent.banner.manageText}
+			<button type="button" class="cookie-consent__btn cookie-consent__btn--ghost" data-cookie-manage data-tina-field={manageField || undefined}>
+				{banner.manageText}
 			</button>
-			<button type="button" class="cookie-consent__btn cookie-consent__btn--outline" data-cookie-reject-all>
-				{cookieConsentContent.banner.rejectAllText}
+			<button type="button" class="cookie-consent__btn cookie-consent__btn--outline" data-cookie-reject-all data-tina-field={rejectField || undefined}>
+				{banner.rejectAllText}
 			</button>
-			<button type="button" class="cookie-consent__btn cookie-consent__btn--accept" data-cookie-accept-all>
-				{cookieConsentContent.banner.acceptAllText}
+			<button type="button" class="cookie-consent__btn cookie-consent__btn--accept" data-cookie-accept-all data-tina-field={acceptField || undefined}>
+				{banner.acceptAllText}
 			</button>
 		</div>
 	</div>
@@ -49,17 +58,17 @@ const style = `--cookie-consent-color: ${color};`;
 	<div class="cookie-consent__overlay" data-cookie-modal-overlay hidden>
 		<div class="cookie-consent__modal" role="dialog" aria-modal="true" aria-labelledby="cookie-preferences-title" data-cookie-modal>
 			<div class="cookie-consent__modal-header">
-				<h2 id="cookie-preferences-title">{cookieConsentContent.preferences.title}</h2>
+				<h2 id="cookie-preferences-title">{preferences.title}</h2>
 				<button
 					type="button"
 					class="cookie-consent__close"
 					data-cookie-close
-					aria-label={cookieConsentContent.preferences.closeLabel}
+					aria-label={preferences.closeLabel}
 				>
 					&times;
 				</button>
 			</div>
-			<p class="cookie-consent__modal-description">{cookieConsentContent.preferences.description}</p>
+			<p class="cookie-consent__modal-description">{preferences.description}</p>
 
 			<ul class="cookie-consent__categories">
 				{cookieConsentContent.categories.map((category) => (
@@ -83,13 +92,13 @@ const style = `--cookie-consent-color: ${color};`;
 
 			<div class="cookie-consent__modal-actions">
 				<button type="button" class="cookie-consent__btn cookie-consent__btn--outline" data-cookie-reject-all>
-					{cookieConsentContent.preferences.rejectAllText}
+					{preferences.rejectAllText}
 				</button>
 				<button type="button" class="cookie-consent__btn cookie-consent__btn--outline" data-cookie-accept-all>
-					{cookieConsentContent.preferences.acceptAllText}
+					{preferences.acceptAllText}
 				</button>
 				<button type="button" class="cookie-consent__btn cookie-consent__btn--accept" data-cookie-save>
-					{cookieConsentContent.preferences.saveText}
+					{preferences.saveText}
 				</button>
 			</div>
 		</div>

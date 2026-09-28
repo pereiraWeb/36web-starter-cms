@@ -15,12 +15,36 @@ export interface Props extends BackgroundProps {
 	submitText?: string;
 	/** Show the embedded map below the business details. Defaults to `true`. */
 	showMap?: boolean;
+	titleField?: string;
+	submitField?: string;
+	email?: string;
+	emailField?: string;
+	phone?: string;
+	phoneField?: string;
+	address?: string;
+	addressField?: string;
+	hours?: string;
+	hoursField?: string;
+	mapAddress?: string;
+	mapTitle?: string;
 }
 
 const {
 	title = contactContent.split.title,
 	submitText = contactContent.split.submitText,
 	showMap = true,
+	titleField,
+	submitField,
+	email,
+	emailField,
+	phone,
+	phoneField,
+	address,
+	addressField,
+	hours,
+	hoursField,
+	mapAddress,
+	mapTitle,
 	backgroundColor,
 	backgroundImage,
 } = Astro.props;
@@ -30,10 +54,21 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 
 <section class="contact-split" style={style}>
 	<Container class="contact-split__grid">
-		<ContactForm class="contact-split__form" submitText={submitText} placeholderLabels />
+		<ContactForm class="contact-split__form" submitText={submitText} submitField={submitField} placeholderLabels />
 		<div class="contact-split__info">
-			<CardContact title={title} />
-			{showMap && <MapEmbed class="contact-split__map" />}
+			<CardContact
+				title={title}
+				titleField={titleField}
+				email={email}
+				emailField={emailField}
+				phone={phone}
+				phoneField={phoneField}
+				address={address}
+				addressField={addressField}
+				hours={hours}
+				hoursField={hoursField}
+			/>
+			{showMap && <MapEmbed class="contact-split__map" address={mapAddress} title={mapTitle} />}
 		</div>
 	</Container>
 </section>

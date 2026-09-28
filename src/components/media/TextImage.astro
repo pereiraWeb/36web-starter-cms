@@ -36,6 +36,11 @@ export interface Props extends BackgroundProps {
 	fullWidth?: boolean;
 	/** Set when this section sits above the fold (e.g. right under the hero) and its image is the page's LCP candidate. */
 	priority?: boolean;
+	eyebrowField?: string;
+	titleField?: string;
+	descriptionField?: string;
+	ctaField?: string;
+	imageField?: string;
 }
 
 const {
@@ -53,6 +58,11 @@ const {
 	priority = false,
 	backgroundColor,
 	backgroundImage,
+	eyebrowField,
+	titleField,
+	descriptionField,
+	ctaField,
+	imageField,
 } = Astro.props;
 
 const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--text-image-height': height });
@@ -73,12 +83,15 @@ const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--text-im
 				titleClass="text-image__title"
 				description={description}
 				descriptionClass="text-image__description"
+				eyebrowField={eyebrowField}
+				titleField={titleField}
+				descriptionField={descriptionField}
 			/>
-			{ctaText && <Button href={ctaHref} class="text-image__cta">{ctaText}</Button>}
+			{ctaText && <Button href={ctaHref} class="text-image__cta" field={ctaField}>{ctaText}</Button>}
 		</div>
 	</div>
 	<div class="text-image__media">
-		<ResponsiveImage src={image} alt={imageAlt} width={800} height={600} priority={priority} />
+		<ResponsiveImage src={image} alt={imageAlt} width={800} height={600} priority={priority} field={imageField} />
 	</div>
 </section>
 

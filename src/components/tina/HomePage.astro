@@ -1,0 +1,87 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import HeroBackground from '../hero/HeroBackground.astro';
+import TextImage from '../media/TextImage.astro';
+import ServicesGrid from '../services/ServicesGrid.astro';
+import TestimonialsGrid from '../testimonials/TestimonialsGrid.astro';
+import CtaCentered from '../cta/CtaCentered.astro';
+import { toPublicImagePath } from '../../lib/content/images';
+import type { HomePageData } from '../../lib/content/pages';
+
+interface Props {
+	data: HomePageData;
+}
+
+const { data } = Astro.props;
+const { document, services, testimonials } = data;
+const story = document.story!;
+const cta = document.cta!;
+const heroImage = toPublicImagePath(document.image) ?? '';
+const storyImage = toPublicImagePath(story.image) ?? '';
+---
+
+<HeroBackground
+	align="center"
+	height="360px"
+	title={document.title}
+	description={document.description}
+	image={heroImage}
+	primaryCtaText={document.buttonText}
+	primaryCtaHref={document.buttonHref}
+	titleField={tinaField(document, 'title')}
+	descriptionField={tinaField(document, 'description')}
+	imageField={tinaField(document, 'image')}
+	buttonField={tinaField(document, 'buttonText')}
+/>
+<TextImage
+	eyebrow={story.eyebrow ?? undefined}
+	title={story.title}
+	description={story.description}
+	ctaText={story.ctaText ?? undefined}
+	ctaHref={story.ctaHref ?? undefined}
+	image={storyImage}
+	imageAlt={story.imageAlt}
+	eyebrowField={tinaField(story, 'eyebrow')}
+	titleField={tinaField(story, 'title')}
+	descriptionField={tinaField(story, 'description')}
+	ctaField={tinaField(story, 'ctaText')}
+	imageField={tinaField(story, 'image')}
+/>
+<ServicesGrid
+	title={document.servicesTitle}
+	description=""
+	titleField={tinaField(document, 'servicesTitle')}
+	items={services.map(({ service, document: source }) => ({
+		...service,
+		titleField: tinaField(source, 'title'),
+		descriptionField: tinaField(source, 'description'),
+	}))}
+/>
+<TestimonialsGrid
+	title={document.testimonialsTitle}
+	description=""
+	titleField={tinaField(document, 'testimonialsTitle')}
+	items={testimonials.map((item) => ({
+		quote: item.quote,
+		author: item.author,
+		role: item.role ?? undefined,
+		rating: item.rating ?? undefined,
+		quoteField: tinaField(item, 'quote'),
+		authorField: tinaField(item, 'author'),
+		roleField: tinaField(item, 'role'),
+	}))}
+/>
+<CtaCentered
+	eyebrow={cta.eyebrow ?? undefined}
+	title={cta.title}
+	description={cta.description ?? undefined}
+	ctaText={cta.ctaText}
+	ctaHref={cta.ctaHref}
+	secondaryCtaText={cta.secondaryCtaText ?? undefined}
+	secondaryCtaHref={cta.secondaryCtaHref ?? undefined}
+	eyebrowField={tinaField(cta, 'eyebrow')}
+	titleField={tinaField(cta, 'title')}
+	descriptionField={tinaField(cta, 'description')}
+	ctaField={tinaField(cta, 'ctaText')}
+	secondaryCtaField={tinaField(cta, 'secondaryCtaText')}
+/>

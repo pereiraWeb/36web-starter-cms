@@ -66,11 +66,13 @@ La previsualización del editor, el commit guardado y la web publicada son tres 
 
 ## Qué se ha comprobado y qué no
 
-Comprobado en local, sin TinaCloud:
+Comprobado en local, sin TinaCloud, el 28 de septiembre de 2026:
 
 - `npm run check` sin errores.
-- `npm run build` con `SKIP_CONFIG_GUARD=true` genera la portada, `/services/service-one` y el resto de páginas. El aviso de datos de ejemplo de `business.ts` sigue activo si no se usa esa variable.
-- En el editor local, cambiar el título de Inicio actualizó el titular de la previsualización (`Taller Norte`) y `POST /tina-island/home` respondió 200. No se pulsó Guardar.
-- En el servicio, cambiar el título a `Servicio piloto` actualizó el titular de la previsualización y los marcadores de título, resumen, texto, foto y características estaban en la página. Se pulsó Restablecer: los JSON siguen con el texto de ejemplo.
+- `npm run build` con `SKIP_CONFIG_GUARD=true` genera la portada, nosotros, contacto, servicios, las seis fichas, gracias y las páginas legales.
+- El editor abre con el título 36WEB, en castellano (Guardar, Restablecer, Estás en modo local). El icono de la llama no sale en la cabecera.
+- En la previsualización de Inicio, cambiar el título a `Taller Norte` actualizó el titular. No se guardó: el JSON sigue con el texto de ejemplo.
+- En Nosotros, cambiar el título a `Estudio Norte` actualizó el titular de `/about`. Se dejó otra vez el texto original y Guardar quedó desactivado.
+- La ficha `/services/service-one` muestra marcadores del servicio y del cierre compartido. La cabecera, el pie y el aviso de cookies salen también en las fichas y en las páginas legales.
 
 No hay proyecto TinaCloud ni token. No se ha probado el inicio de sesión, un commit en GitHub, un despliegue real ni el acceso con un usuario Editor. No se ha enviado ningún correo.

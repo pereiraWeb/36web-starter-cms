@@ -9,14 +9,18 @@ export interface Props extends BackgroundProps {
 	eyebrow?: string;
 	title?: string;
 	description?: string;
+	items?: Array<{ question: string; answer: string; questionField?: string; answerField?: string }>;
+	titleField?: string;
 }
 
 const {
 	eyebrow = faqContent.accordion.eyebrow,
 	title = faqContent.accordion.title,
 	description = faqContent.accordion.description,
+	items = faqs,
 	backgroundColor,
 	backgroundImage,
+	titleField,
 } = Astro.props;
 
 const style = backgroundStyle({ backgroundColor, backgroundImage });
@@ -25,13 +29,9 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 <section class="faq-accordion" style={style}>
 	<Container>
 		<div class="faq-accordion__header">
-			<SectionHeading
-				eyebrow={eyebrow}
-				title={title}
-				description={description}
-			/>
+			<SectionHeading eyebrow={eyebrow} title={title} description={description} titleField={titleField} />
 		</div>
-		<Accordion items={faqs} class="faq-accordion__list" />
+		<Accordion items={items} class="faq-accordion__list" />
 	</Container>
 </section>
 

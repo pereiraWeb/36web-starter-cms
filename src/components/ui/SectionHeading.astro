@@ -28,14 +28,17 @@ export interface Props {
 	titleClass?: string;
 	description?: string;
 	descriptionClass?: string;
+	eyebrowField?: string;
+	titleField?: string;
+	descriptionField?: string;
 }
 
-const { as: Tag = 'h2', eyebrow, eyebrowClass, title, titleClass, description, descriptionClass } = Astro.props;
+const { as: Tag = 'h2', eyebrow, eyebrowClass, title, titleClass, description, descriptionClass, eyebrowField, titleField, descriptionField } = Astro.props;
 ---
 
-{eyebrow && <span class={eyebrowClass ?? 'section-heading__eyebrow'}>{eyebrow}</span>}
-{title && <Tag class={titleClass}>{title}</Tag>}
-{description && <p class={descriptionClass ?? 'section-heading__description'}>{description}</p>}
+{eyebrow && <span class={eyebrowClass ?? 'section-heading__eyebrow'} data-tina-field={eyebrowField || undefined}>{eyebrow}</span>}
+{title && <Tag class={titleClass} data-tina-field={titleField || undefined}>{title}</Tag>}
+{description && <p class={descriptionClass ?? 'section-heading__description'} data-tina-field={descriptionField || undefined}>{description}</p>}
 
 <style>
 	.section-heading__eyebrow {

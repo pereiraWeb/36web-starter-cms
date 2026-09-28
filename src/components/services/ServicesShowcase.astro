@@ -2,7 +2,7 @@
 import Container from '../ui/Container.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
 import CardImage from '../cards/CardImage.astro';
-import { services, servicesContent, getServiceHref } from '../../config/servicesContent';
+import { services, servicesContent, getServiceHref, type Service } from '../../config/servicesContent';
 import { backgroundStyle, type BackgroundProps } from '../../lib/background';
 
 export interface Props extends BackgroundProps {
@@ -10,6 +10,11 @@ export interface Props extends BackgroundProps {
 	title?: string;
 	description?: string;
 	ctaText?: string;
+	items?: Array<Service & { titleField?: string; descriptionField?: string; imageField?: string }>;
+	eyebrowField?: string;
+	titleField?: string;
+	descriptionField?: string;
+	ctaField?: string;
 }
 
 const {
@@ -19,7 +24,13 @@ const {
 	ctaText = servicesContent.showcase.ctaText,
 	backgroundColor,
 	backgroundImage,
+	eyebrowField,
+	titleField,
+	descriptionField,
+	ctaField,
 } = Astro.props;
+
+const items = (Astro.props.items ?? services) as NonNullable<Props['items']>;
 
 const style = backgroundStyle({ backgroundColor, backgroundImage });
 ---
@@ -31,10 +42,13 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 				eyebrow={eyebrow}
 				title={title}
 				description={description}
+				eyebrowField={eyebrowField}
+				titleField={titleField}
+				descriptionField={descriptionField}
 			/>
 		</div>
 		<ul class="services-showcase__list">
-			{services.map((service) => (
+			{items.map((service) => (
 				<li>
 					<CardImage
 						title={service.title}
@@ -42,6 +56,10 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 						image={service.image}
 						ctaText={ctaText}
 						href={getServiceHref(service)}
+						titleField={service.titleField}
+						descriptionField={service.descriptionField}
+						imageField={service.imageField}
+						ctaField={ctaField}
 					/>
 				</li>
 			))}

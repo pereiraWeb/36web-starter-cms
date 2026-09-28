@@ -2,7 +2,7 @@
 
 Plantilla de web corporativa hecha con [Astro](https://astro.build). Incluye todas las secciones típicas de una web de empresa (portada, servicios, equipo, testimonios, preguntas frecuentes, contacto...), cada una con **varias variantes visuales** para elegir, y un **formulario de contacto funcional** que envía emails de verdad mediante [Resend](https://resend.com).
 
-El piloto del CMS usa [TinaCMS](https://tina.io) y TinaCloud. Hoy se puede editar en el editor visual el título, la descripción y la fotografía de la portada, y un servicio con su página. El resto del contenido sigue en `src/config/`. Guía de alta: [docs/CMS-SETUP.md](docs/CMS-SETUP.md). Guía para quien edita: [docs/CMS-CLIENTE.md](docs/CMS-CLIENTE.md). Costes, accesos y fallos: [docs/CMS-OPERACION.md](docs/CMS-OPERACION.md).
+El contenido de la web pública se edita con [TinaCMS](https://tina.io) y TinaCloud: negocio, portada, nosotros, servicios, contacto, equipo, opiniones y preguntas. La galería `/demos` sigue en `src/config/`. Guía de alta: [docs/CMS-SETUP.md](docs/CMS-SETUP.md). Guía para quien edita: [docs/CMS-CLIENTE.md](docs/CMS-CLIENTE.md). Costes, accesos y fallos: [docs/CMS-OPERACION.md](docs/CMS-OPERACION.md).
 
 Todo el contenido (textos, colores, datos de la empresa, menú...) está centralizado en archivos de configuración fáciles de editar, en `src/config/`. **No hace falta tocar el diseño ni el código de los componentes para lanzar tu web** — solo rellenar esos archivos con tus datos reales.
 
@@ -166,7 +166,7 @@ Cada sección de la web tiene su propio archivo de configuración en `src/config
 
 | Sección | Archivo |
 |---|---|
-| Portada / hero | El título, la descripción y la foto de la portada están en `content/pages/home.json` (editor: Inicio). El resto de heroes sigue en `heroContent.ts` |
+| Portada / hero | La portada pública está en `content/pages/home.json` (editor: Inicio). Los heroes de `/demos` siguen en `heroContent.ts` |
 | Servicios | `service-one` está en `content/services/service-one.json` (editor: Servicios) y tiene página propia. Los demás servicios de ejemplo siguen en `servicesContent.ts` |
 | Equipo | `teamContent.ts` |
 | Testimonios | `testimonialsContent.ts` |

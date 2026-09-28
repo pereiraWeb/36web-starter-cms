@@ -13,16 +13,20 @@ export interface Props {
 	image?: string;
 	bio?: string;
 	socialLinks?: SocialLink[];
+	nameField?: string;
+	roleField?: string;
+	bioField?: string;
+	imageField?: string;
 }
 
-const { name, role, image = imageFallbacks.photo, bio, socialLinks = [] } = Astro.props;
+const { name, role, image = imageFallbacks.photo, bio, socialLinks = [], nameField, roleField, bioField, imageField } = Astro.props;
 ---
 
 <article class="card-profile">
-	<ResponsiveImage class="card-profile__avatar" src={image} alt={name} width={80} height={80} />
-	<p class="card-profile__name">{name}</p>
-	<p class="card-profile__role">{role}</p>
-	{bio && <p class="card-profile__bio">{bio}</p>}
+	<ResponsiveImage class="card-profile__avatar" src={image} alt={name} width={80} height={80} field={imageField} />
+	<p class="card-profile__name" data-tina-field={nameField || undefined}>{name}</p>
+	<p class="card-profile__role" data-tina-field={roleField || undefined}>{role}</p>
+	{bio && <p class="card-profile__bio" data-tina-field={bioField || undefined}>{bio}</p>}
 	{socialLinks.length > 0 && (
 		<ul class="card-profile__social">
 			{socialLinks.map((link) => (

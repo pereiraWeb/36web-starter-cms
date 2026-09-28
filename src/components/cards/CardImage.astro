@@ -16,6 +16,10 @@ export interface Props {
 	href?: string;
 	/** Set on the one card whose image is the page's LCP candidate (rare — usually only relevant for the first card in a grid rendered above the fold). */
 	priority?: boolean;
+	titleField?: string;
+	descriptionField?: string;
+	imageField?: string;
+	ctaField?: string;
 }
 
 const {
@@ -28,20 +32,24 @@ const {
 	ctaHref = '#',
 	href,
 	priority = false,
+	titleField,
+	descriptionField,
+	imageField,
+	ctaField,
 } = Astro.props;
 const Tag = href ? 'a' : 'article';
 ---
 
 <Tag class="card-image" href={href}>
 	<div class="card-image__media">
-		<ResponsiveImage src={image} alt={imageAlt} width={640} height={400} priority={priority} />
+		<ResponsiveImage src={image} alt={imageAlt} width={640} height={400} priority={priority} field={imageField} />
 		{tag && <span class="card-image__tag">{tag}</span>}
 	</div>
 	<div class="card-image__body">
-		<h3 class="card-image__title">{title}</h3>
-		<p class="card-image__description">{description}</p>
+		<h3 class="card-image__title" data-tina-field={titleField || undefined}>{title}</h3>
+		<p class="card-image__description" data-tina-field={descriptionField || undefined}>{description}</p>
 		{ctaText && (href ? (
-			<span class="card-image__cta card-image__cta--static" aria-hidden="true">
+			<span class="card-image__cta card-image__cta--static" aria-hidden="true" data-tina-field={ctaField || undefined}>
 				{ctaText}
 				<Icon name="arrow-right" size={16} />
 			</span>

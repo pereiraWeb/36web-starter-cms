@@ -3,7 +3,7 @@ import type { NavItem } from '../../config/navigation';
 import Icon from '../ui/Icon.astro';
 
 export interface Props {
-	items: NavItem[];
+	items: Array<NavItem & { labelField?: string }>;
 	align?: 'start' | 'center' | 'end';
 }
 
@@ -43,7 +43,7 @@ function isActive(href: string): boolean {
 				return (
 					<li class:list={['nav-menu__item', { 'nav-menu__item--has-children': hasChildren }]}>
 						<div class="nav-menu__item-row">
-							<a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+							<a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined} data-tina-field={item.labelField || undefined}>
 								{item.label}
 							</a>
 							{hasChildren && (

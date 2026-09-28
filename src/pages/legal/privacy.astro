@@ -1,7 +1,10 @@
 ---
 import LegalLayout from '../../layouts/LegalLayout.astro';
-import { business } from '../../config/business';
+import { tinaField } from '@tinacms/astro/tina-field';
 import { legalRoutes } from '../../config/navigation';
+import { getSiteContent } from '../../lib/content/site';
+
+const site = await getSiteContent();
 ---
 
 <LegalLayout
@@ -11,12 +14,12 @@ import { legalRoutes } from '../../config/navigation';
 >
 	<h2>Responsable del tratamiento</h2>
 	<ul>
-		<li>Titular: {business.legalName}</li>
+		<li data-tina-field={tinaField(site.document, 'legalName')}>Titular: {site.legalName}</li>
 		<li>NIF/CIF: [NIF/CIF DE LA EMPRESA]</li>
-		<li>
-			Domicilio: {business.address.street}, {business.address.postalCode} {business.address.city}, {business.address.country}
+		<li data-tina-field={tinaField(site.document, 'address')}>
+			Domicilio: {site.address.street}, {site.address.postalCode} {site.address.city}, {site.address.country}
 		</li>
-		<li>Correo electrónico: {business.email}</li>
+		<li data-tina-field={tinaField(site.document, 'email')}>Correo electrónico: {site.email}</li>
 		<li>Delegado de Protección de Datos (si aplica): [NOMBRE Y CONTACTO DEL DPD, O "No aplica"]</li>
 	</ul>
 
@@ -60,10 +63,10 @@ import { legalRoutes } from '../../config/navigation';
 	<h2>Tus derechos</h2>
 	<p>
 		Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad
-		escribiendo a {business.email}. También puedes presentar una reclamación ante la autoridad de control
+		escribiendo a <span data-tina-field={tinaField(site.document, 'email')}>{site.email}</span>. También puedes presentar una reclamación ante la autoridad de control
 		competente [POR EJEMPLO, LA AGENCIA ESPAÑOLA DE PROTECCIÓN DE DATOS — www.aepd.es] si consideras que no hemos
 		atendido tu solicitud correctamente.
 	</p>
 
-	<p>Cualquier duda sobre el tratamiento de tus datos puede enviarse a {business.email}.</p>
+	<p>Cualquier duda sobre el tratamiento de tus datos puede enviarse a <span data-tina-field={tinaField(site.document, 'email')}>{site.email}</span>.</p>
 </LegalLayout>

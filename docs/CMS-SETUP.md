@@ -1,13 +1,19 @@
-# Alta del CMS (piloto)
+# Alta del CMS
 
-Este starter edita contenido con TinaCMS. La web pública sigue siendo Astro estático. El editor vive en `/admin` y no convierte las páginas en React.
+Este starter edita el contenido de la web pública con TinaCMS. La web sigue siendo Astro estático. El editor vive en `/admin` y no convierte las páginas en React.
 
-Hoy el piloto cubre:
+El cliente puede cambiar, desde el editor:
 
-- Título, descripción y fotografía de la portada (`content/pages/home.json`).
-- Un servicio y su página (`content/services/service-one.json` → `/services/service-one`).
+- Datos del negocio: nombre, teléfono, email público, dirección, horarios, logo, menú y pie.
+- Portada: titular, foto, historia, servicios destacados, opiniones y cierre.
+- Nosotros: titular, historia, texto y equipo.
+- Servicios: el listado, cada servicio y su página, y las preguntas.
+- Contacto y la página de gracias.
+- Textos del aviso de cookies.
 
-El resto de textos sigue en `src/config/`. Dominio, analítica, destinatario del formulario y diseño no están en el editor.
+Las páginas de ejemplo en `/demos` siguen leyendo `src/config/` para no mezclar la galería de diseño con el contenido del cliente. Dominio, idioma, analítica, destinatario real del formulario, categorías de cookies y diseño no están en el editor.
+
+El editor muestra el título **36WEB** y los botones del programa en castellano (Guardar, Restablecer, y el resto de la interfaz). Tina no trae un idioma oficial para esa interfaz: la traducción se aplica al abrir `/admin`.
 
 Versiones comprobadas al instalar: Astro 7.1.3, `@tinacms/astro` 0.7.1 (compatible con Astro 5, 6 y 7), `tinacms` 3.14.1, `@tinacms/cli` 3.1.0. La guía oficial es [Astro + TinaCMS](https://tina.io/docs/frameworks/astro) y [edición visual en Astro](https://tina.io/docs/contextual-editing/astro).
 
@@ -61,14 +67,25 @@ El Client ID es público y queda dentro del JavaScript de `/admin`. El token es 
 
 | Apartado del editor | Dónde sale en la web | Archivo |
 |---|---|---|
-| Inicio | Título, párrafo y foto de la portada | `content/pages/home.json` |
-| Servicios → Service One | Página `/services/service-one` y ficha de ese servicio en la portada | `content/services/service-one.json` |
+| Sitio | Logo, menú, pie, teléfono, email, horarios, aviso de cookies | `content/site/business.json` |
+| Inicio | Portada completa | `content/pages/home.json` |
+| Nosotros | `/about` | `content/pages/about.json` |
+| Contacto | `/contact` y `/thank-you` | `content/pages/contact.json` |
+| Página de servicios | `/services` | `content/pages/services.json` |
+| Servicios | Cada `/services/nombre` y las fichas del listado | `content/services/*.json` |
+| Equipo | Personas en `/about` | `content/team/*.json` |
+| Opiniones | Citas en la portada | `content/testimonials/*.json` |
+| Preguntas | Acordeón en `/services` | `content/faq/*.json` |
+
+El número **Orden** decide la secuencia de servicios, equipo, opiniones y preguntas. El 1 sale primero.
 
 La foto nueva se sube desde el campo de imagen y se guarda en `public/uploads/`. En local, el archivo aparece en el disco. Con TinaCloud, el cambio entra en Git junto con el contenido. No se escribe en el disco efímero del hosting.
 
 El nombre del archivo del servicio es la URL: `service-one.json` es `/services/service-one`. Si se renombra, la URL antigua deja de existir. Para conservarla, añade una redirección en `redirects` de `astro.config.mjs` antes de publicar.
 
-Borrar el documento del servicio borra el JSON. En el siguiente despliegue, esa URL desaparece. Los otros servicios de ejemplo siguen saliendo de `src/config/servicesContent.ts` y no se editan aquí.
+Borrar el documento del servicio borra el JSON. En el siguiente despliegue, esa URL desaparece.
+
+Los avisos legales usan el nombre, la dirección, el email y el teléfono del apartado Sitio. El texto jurídico de esas páginas sigue en los archivos de `src/pages/legal/` y no se reescribe desde el editor.
 
 ## Publicar
 
@@ -81,6 +98,6 @@ Guardar en el editor y ver la web pública son momentos distintos.
 
 En el plan gratuito y en el plan Team no hay borradores, aprobación ni ramas de revisión. Eso aparece en Team Plus o superior. Ver [CMS-OPERACION.md](CMS-OPERACION.md).
 
-## Fuera de este piloto
+## Qué no entra en el editor
 
-Todavía no están en el editor: negocio (teléfono, horarios, logo), nosotros, contacto, el resto de servicios, equipo, preguntas, opiniones, SEO por página y textos legales. El formulario sigue en `/api/contact` con Resend y no guarda mensajes en Tina.
+Dominio canónico, idioma de la web, analítica, claves, destinatario interno del formulario, diseño y las categorías técnicas de las cookies siguen en `src/config/`. El formulario sigue en `/api/contact` con Resend y no guarda mensajes en Tina. Las páginas `/demos` son la galería de diseño y no las edita el cliente.

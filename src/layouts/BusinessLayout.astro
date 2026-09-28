@@ -1,13 +1,14 @@
 ---
-import { HeaderSimple } from '../components/header';
-import { FooterColumns } from '../components/footer';
 import SkipLink from '../components/ui/SkipLink.astro';
-import WhatsappButton from '../components/ui/WhatsappButton.astro';
 import BackToTop from '../components/ui/BackToTop.astro';
-import CookieConsent from '../components/ui/CookieConsent.astro';
 import SeoHead from '../components/ui/SeoHead.astro';
 import OrganizationSchema from '../components/seo/OrganizationSchema.astro';
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import SiteHeader from '../components/tina/SiteHeader.astro';
+import SiteFooter from '../components/tina/SiteFooter.astro';
 import { business } from '../config/business';
+import { getSiteContent } from '../lib/content/site';
+import { islands } from '../lib/tina/islands';
 import type { SeoProps } from '../lib/seo';
 import '../styles/tokens.css';
 import '../styles/global.css';
@@ -30,7 +31,12 @@ import '../styles/global.css';
  */
 export interface Props extends SeoProps {}
 
-const seoProps = Astro.props;
+const site = await getSiteContent();
+const seoProps = {
+	...Astro.props,
+	siteName: Astro.props.siteName ?? site.name,
+	siteDescription: Astro.props.siteDescription ?? site.description,
+};
 ---
 
 <html lang={business.language}>
@@ -43,18 +49,36 @@ const seoProps = Astro.props;
 		<meta name="generator" content={Astro.generator} />
 
 		<SeoHead {...seoProps} />
-		<OrganizationSchema />
+		<OrganizationSchema
+			name={site.name}
+			legalName={site.legalName}
+			description={site.description}
+			email={site.email}
+			phone={site.phone}
+			logo={site.logo}
+			social={site.social}
+		/>
 	</head>
 	<body>
 		<SkipLink />
-		<slot name="header"><HeaderSimple /></slot>
+		{Astro.slots.has('header') ? (
+			<slot name="header" />
+		) : (
+			<TinaIsland name="site-header" wrapper={islands['site-header'].wrapper}>
+				<SiteHeader site={site} />
+			</TinaIsland>
+		)}
 		<main id="main-content">
 			<slot />
 		</main>
-		<slot name="footer"><FooterColumns /></slot>
-		<WhatsappButton />
+		{Astro.slots.has('footer') ? (
+			<slot name="footer" />
+		) : (
+			<TinaIsland name="site-footer" wrapper={islands['site-footer'].wrapper}>
+				<SiteFooter site={site} />
+			</TinaIsland>
+		)}
 		<BackToTop />
-		<CookieConsent />
 
 		<script>
 			import { initAnalytics } from '../lib/analytics';

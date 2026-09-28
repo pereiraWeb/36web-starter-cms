@@ -1,0 +1,31 @@
+---
+import { tinaField } from '@tinacms/astro/tina-field';
+import { HeaderSimple } from '../header';
+import { getWhatsappUrl } from '../../lib/whatsapp';
+import type { IconLinkItem } from '../ui/IconLinks.astro';
+import type { SiteContent } from '../../lib/content/site';
+
+interface Props {
+	site: SiteContent;
+}
+
+const { site } = Astro.props;
+const iconLinks: IconLinkItem[] = [];
+if (site.phone) iconLinks.push({ icon: 'whatsapp', href: getWhatsappUrl(site.phone), label: 'WhatsApp' });
+if (site.email) iconLinks.push({ icon: 'mail', href: `mailto:${site.email}`, label: 'Email' });
+if (site.social.instagram) iconLinks.push({ icon: 'instagram', href: site.social.instagram, label: 'Instagram' });
+if (site.social.facebook) iconLinks.push({ icon: 'facebook', href: site.social.facebook, label: 'Facebook' });
+
+const items = site.navigation.map((item) => ({
+	...item,
+	labelField: item.source ? tinaField(item.source, 'label') : undefined,
+}));
+---
+
+<HeaderSimple
+	logo={site.logo}
+	logoAlt={site.name}
+	logoField={tinaField(site.document, 'logo')}
+	iconLinks={iconLinks}
+	items={items}
+/>

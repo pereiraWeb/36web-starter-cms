@@ -10,8 +10,9 @@ import type { SeoProps } from '../lib/seo';
  * `BusinessLayout`, so every such page gets both automatically instead of
  * repeating the same two lines everywhere.
  *
- * Header/footer overrides still work exactly like `BusinessLayout` — pass
- * `<HeaderX slot="header" />` / `<FooterX slot="footer" />` as children.
+ * The header, the footer and the cookie notice come from `BusinessLayout`.
+ * To swap those for a demo variant, use `BusinessLayout` directly and pass
+ * `<HeaderX slot="header" />` / `<FooterX slot="footer" />`.
  */
 export interface Props extends SeoProps {
 	/** Visible `<h1>` text shown in the `PageHeader`. Defaults to the SEO `title`. */
@@ -38,8 +39,6 @@ const { title, description } = seoProps;
 ---
 
 <BusinessLayout {...seoProps}>
-	<slot name="header" slot="header" />
-	<slot name="footer" slot="footer" />
 	{breadcrumbs && breadcrumbs.length > 0 && <Breadcrumbs items={[{ label: homeLabel, href: '/' }, ...breadcrumbs]} />}
 	{showPageHeader && <PageHeader title={heading ?? title} description={headingDescription ?? description} />}
 	<slot />

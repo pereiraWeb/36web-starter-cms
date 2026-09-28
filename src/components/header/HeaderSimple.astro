@@ -11,14 +11,18 @@ import NavMenu from './NavMenu.astro';
 export interface Props extends BackgroundProps {
 	logo?: string;
 	logoAlt?: string;
+	logoField?: string;
 	/** Social/contact/WhatsApp icons shown on the right. Defaults to configured social links + WhatsApp. */
 	iconLinks?: IconLinkItem[];
+	items?: Array<import('../../config/navigation').NavItem & { labelField?: string }>;
 }
 
 const {
 	logo = business.logo,
 	logoAlt = business.name,
+	logoField,
 	iconLinks = getHeaderIconLinks(),
+	items = mainNavigation,
 	backgroundColor,
 	backgroundImage,
 } = Astro.props;
@@ -28,10 +32,10 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 <header class="header-simple" style={style}>
 	<Container class="header-simple__inner">
 		<a href="/" class="header-simple__brand">
-			<BrandMark logo={logo} logoAlt={logoAlt} class="header-simple__logo" />
+			<BrandMark logo={logo} logoAlt={logoAlt} class="header-simple__logo" field={logoField} />
 		</a>
 		<nav class="header-simple__nav" aria-label="Navegación principal">
-			<NavMenu items={mainNavigation} />
+			<NavMenu items={items} />
 		</nav>
 		<IconLinks items={iconLinks} size={18} class="header-simple__icon-links" />
 	</Container>

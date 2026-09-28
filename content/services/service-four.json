@@ -1,0 +1,13 @@
+{
+  "title": "Service Four",
+  "description": "Short description of the third service offered.",
+  "body": "A more detailed explanation of what this service includes, who it is for, and the outcomes a client can expect from working with us on it.",
+  "image": "/img/fallback.webp",
+  "imageAlt": "Service Four",
+  "features": [
+    "Tailored to your needs",
+    "Clear timelines and pricing",
+    "Dedicated support throughout"
+  ],
+  "order": 4
+}

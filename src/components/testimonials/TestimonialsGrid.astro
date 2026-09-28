@@ -9,6 +9,8 @@ export interface Props extends BackgroundProps {
 	eyebrow?: string;
 	title?: string;
 	description?: string;
+	items?: Array<{ quote: string; author: string; role?: string; avatar?: string; rating?: number; quoteField?: string; authorField?: string; roleField?: string }>;
+	titleField?: string;
 }
 
 const {
@@ -17,7 +19,10 @@ const {
 	description = testimonialsContent.grid.description,
 	backgroundColor,
 	backgroundImage,
+	titleField,
 } = Astro.props;
+
+const items = (Astro.props.items ?? testimonials) as NonNullable<Props['items']>;
 
 const style = backgroundStyle({ backgroundColor, backgroundImage });
 ---
@@ -25,14 +30,10 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 <section class="testimonials-grid" style={style}>
 	<Container>
 		<div class="testimonials-grid__header">
-			<SectionHeading
-				eyebrow={eyebrow}
-				title={title}
-				description={description}
-			/>
+			<SectionHeading eyebrow={eyebrow} title={title} description={description} titleField={titleField} />
 		</div>
 		<ul class="testimonials-grid__list">
-			{testimonials.map((testimonial) => (
+			{items.map((testimonial) => (
 				<li>
 					<CardTestimonial
 						quote={testimonial.quote}
@@ -40,6 +41,9 @@ const style = backgroundStyle({ backgroundColor, backgroundImage });
 						role={testimonial.role}
 						avatar={testimonial.avatar}
 						rating={testimonial.rating}
+						quoteField={testimonial.quoteField}
+						authorField={testimonial.authorField}
+						roleField={testimonial.roleField}
 					/>
 				</li>
 			))}

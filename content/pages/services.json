@@ -1,0 +1,21 @@
+{
+  "heroTitle": "Services",
+  "heroDescription": "Discover the services we offer.",
+  "heroImage": "/img/fallback.webp",
+  "seoTitle": "Services",
+  "seoDescription": "Discover the services we offer.",
+  "eyebrow": "Services",
+  "title": "A closer look at what we offer",
+  "description": "",
+  "ctaText": "Learn more",
+  "faqTitle": "Frequently Asked Questions",
+  "detailCta": {
+    "eyebrow": "Let's work together",
+    "title": "Start your project today",
+    "description": "Reach out and get a free, no-obligation consultation with our team.",
+    "ctaText": "Request a quote",
+    "ctaHref": "/contact",
+    "secondaryCtaText": "Learn more",
+    "secondaryCtaHref": "/about"
+  }
+}

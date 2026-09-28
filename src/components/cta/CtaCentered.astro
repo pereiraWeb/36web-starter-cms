@@ -15,6 +15,11 @@ export interface Props extends BackgroundProps {
 	secondaryCtaHref?: string;
 	/** Any valid CSS length (e.g. "auto", "320px", "50vh"). */
 	height?: string;
+	eyebrowField?: string;
+	titleField?: string;
+	descriptionField?: string;
+	ctaField?: string;
+	secondaryCtaField?: string;
 }
 
 const {
@@ -28,6 +33,11 @@ const {
 	height = ctaContent.centered.height,
 	backgroundColor = 'var(--color-primary)',
 	backgroundImage,
+	eyebrowField,
+	titleField,
+	descriptionField,
+	ctaField,
+	secondaryCtaField,
 } = Astro.props;
 
 const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--cta-centered-height': height });
@@ -42,10 +52,13 @@ const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--cta-cen
 		titleClass="cta-centered__title"
 		description={description}
 		descriptionClass="cta-centered__description"
+		eyebrowField={eyebrowField}
+		titleField={titleField}
+		descriptionField={descriptionField}
 	/>
 		<div class="cta-centered__actions">
-			<Button href={ctaHref} variant="inverse" track="cta_click" trackLabel={ctaText}>{ctaText}</Button>
-			{secondaryCtaText && <Button href={secondaryCtaHref} variant="inverse-outline">{secondaryCtaText}</Button>}
+			<Button href={ctaHref} variant="inverse" track="cta_click" trackLabel={ctaText} field={ctaField}>{ctaText}</Button>
+			{secondaryCtaText && <Button href={secondaryCtaHref} variant="inverse-outline" field={secondaryCtaField}>{secondaryCtaText}</Button>}
 		</div>
 	</Container>
 </section>

@@ -37,6 +37,9 @@ export interface SeoProps {
   image?: SeoImage;
   /** Open Graph type. Defaults to `seoDefaults.defaultOgType`. */
   type?: 'website' | 'article' | 'profile';
+  siteName?: string;
+  /** Fallback description when a page does not pass its own. */
+  siteDescription?: string;
 }
 
 export interface SeoMeta {
@@ -88,7 +91,7 @@ function guessImageMimeType(src: string): string {
  * carries over query params or a trailing slash.
  */
 export function getSeoMeta(pageUrl: URL, props: SeoProps): SeoMeta {
-  const { title, description, canonical, noindex = false, nofollow = false, image, type = seoDefaults.defaultOgType } = props;
+  const { title, description, canonical, noindex = false, nofollow = false, image, type = seoDefaults.defaultOgType, siteName, siteDescription } = props;
 
   const canonicalPath = canonical ? new URL(canonical, business.siteUrl).pathname : normalizePathname(pageUrl.pathname);
   const canonicalUrl = toAbsoluteUrl(normalizePathname(canonicalPath));
@@ -101,8 +104,8 @@ export function getSeoMeta(pageUrl: URL, props: SeoProps): SeoMeta {
   };
 
   return {
-    title: `${title} ${seoDefaults.titleSeparator} ${business.name}`,
-    description: description ?? business.description,
+    title: `${title} ${seoDefaults.titleSeparator} ${siteName ?? business.name}`,
+    description: description ?? siteDescription ?? business.description,
     canonical: canonicalUrl,
     robots: [noindex ? 'noindex' : 'index', nofollow ? 'nofollow' : 'follow'].join(', '),
     image: {
@@ -114,7 +117,7 @@ export function getSeoMeta(pageUrl: URL, props: SeoProps): SeoMeta {
     },
     type,
     locale: OG_LOCALE,
-    siteName: business.name,
+    siteName: siteName ?? business.name,
     language: business.language,
   };
 }

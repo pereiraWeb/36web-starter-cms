@@ -4,6 +4,8 @@ import Icon from './Icon.astro';
 export interface AccordionItem {
 	question: string;
 	answer: string;
+	questionField?: string;
+	answerField?: string;
 }
 
 export interface Props {
@@ -19,11 +21,11 @@ const { items, class: className } = Astro.props;
 		items.map((item) => (
 			<details class="accordion__item">
 				<summary class="accordion__trigger">
-					<span>{item.question}</span>
+					<span data-tina-field={item.questionField || undefined}>{item.question}</span>
 					<Icon name="chevron-down" size={18} class="accordion__icon" />
 				</summary>
 				<div class="accordion__panel">
-					<p>{item.answer}</p>
+					<p data-tina-field={item.answerField || undefined}>{item.answer}</p>
 				</div>
 			</details>
 		))
