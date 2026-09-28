@@ -1,0 +1,54 @@
+---
+/**
+ * The eyebrow + title + description header repeated at the top of most
+ * section components (FAQ, Services, Team, Testimonials, CTA, Hero...).
+ * Renders just the three elements — no wrapping `<div>` — so it drops
+ * straight into each component's existing markup (inside their own header
+ * `<div>` or `<Container>`), keeping every component's own BEM class names
+ * and scoped styles untouched.
+ *
+ * Eyebrow and description have built-in defaults below (uppercase primary
+ * label + muted body copy) — nearly every consumer previously redeclared
+ * those exact same blocks under its own BEM class name, pure duplicated
+ * CSS. Titles genuinely vary in size per context (a hero title vs. a card
+ * title), so those still take a `titleClass` from the caller with no
+ * default. Pass `eyebrowClass` / `descriptionClass` yourself only when a
+ * component needs a *different* treatment (e.g. `HeroCentered`'s pill
+ * badge, a CTA with a dark background, a description with a custom
+ * `font-size`) — when provided, the custom class fully replaces the
+ * default instead of adding to it, so there's never a specificity fight
+ * between the two.
+ */
+export interface Props {
+	/** Heading tag to use for the title. Defaults to `"h2"` — use `"h1"` for hero components, `"h3"` for cards. */
+	as?: 'h1' | 'h2' | 'h3' | 'h4';
+	eyebrow?: string;
+	eyebrowClass?: string;
+	title?: string;
+	titleClass?: string;
+	description?: string;
+	descriptionClass?: string;
+}
+
+const { as: Tag = 'h2', eyebrow, eyebrowClass, title, titleClass, description, descriptionClass } = Astro.props;
+---
+
+{eyebrow && <span class={eyebrowClass ?? 'section-heading__eyebrow'}>{eyebrow}</span>}
+{title && <Tag class={titleClass}>{title}</Tag>}
+{description && <p class={descriptionClass ?? 'section-heading__description'}>{description}</p>}
+
+<style>
+	.section-heading__eyebrow {
+		display: inline-block;
+		margin-bottom: var(--spacing-xs);
+		color: var(--color-primary);
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.section-heading__description {
+		color: var(--color-text-muted);
+	}
+</style>

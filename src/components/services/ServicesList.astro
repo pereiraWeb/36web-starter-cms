@@ -1,0 +1,92 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { services, servicesContent, getServiceHref } from '../../config/servicesContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = servicesContent.list.eyebrow,
+	title = servicesContent.list.title,
+	description = servicesContent.list.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="services-list" style={style}>
+	<Container>
+		<div class="services-list__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ol class="services-list__rows">
+			{services.map((service, index) => (
+				<li>
+					<a class="services-list__row" href={getServiceHref(service)}>
+						<span class="services-list__index">{String(index + 1).padStart(2, '0')}</span>
+						<div>
+							<h3 class="services-list__title">{service.title}</h3>
+							<p class="services-list__description-text">{service.description}</p>
+						</div>
+					</a>
+				</li>
+			))}
+		</ol>
+	</Container>
+</section>
+
+<style>
+	.services-list__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+	}
+
+
+	.services-list__rows {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.services-list__row {
+		display: flex;
+		gap: var(--spacing-md);
+		align-items: baseline;
+		padding-block: var(--spacing-md);
+		border-top: 1px solid var(--color-border);
+		color: inherit;
+		text-decoration: none;
+		transition: padding-left 0.2s ease;
+	}
+
+	.services-list__row:hover {
+		padding-left: var(--spacing-xs);
+	}
+
+	.services-list__index {
+		color: var(--color-primary);
+		font-size: 1.25rem;
+		font-weight: 700;
+	}
+
+	.services-list__title {
+		margin: 0 0 0.25rem;
+		font-size: 1.1rem;
+	}
+
+	.services-list__description-text {
+		margin: 0;
+		color: var(--color-text-muted);
+	}
+</style>

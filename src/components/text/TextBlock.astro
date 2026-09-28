@@ -1,0 +1,74 @@
+---
+import Container from '../ui/Container.astro';
+import { textBlockContent } from '../../config/textBlockContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+/**
+ * Plain text section — a title, an optional short description right below
+ * it, and a body paragraph. No image, no card, no CTA: just editable copy,
+ * for simple "about"-style blurbs. Defaults to the lorem ipsum placeholder
+ * in `src/config/textBlockContent.ts` until you replace it with real content.
+ */
+export interface Props extends BackgroundProps {
+	title?: string;
+	/** Optional short text rendered right below the title. Omit (or pass an empty string) to skip it entirely. */
+	description?: string;
+	paragraph?: string;
+	align?: 'left' | 'center';
+	class?: string;
+}
+
+const {
+	title = textBlockContent.title,
+	description = textBlockContent.description,
+	paragraph = textBlockContent.paragraph,
+	align = 'left',
+	backgroundColor,
+	backgroundImage,
+	class: className,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class:list={['text-block', `text-block--${align}`, className]} style={style}>
+	<Container narrow class="text-block__inner">
+		<h2 class="text-block__title">{title}</h2>
+		{description && <p class="text-block__description">{description}</p>}
+		<p class="text-block__paragraph">{paragraph}</p>
+	</Container>
+</section>
+
+<style>
+	.text-block {
+		width: 100%;
+		padding-block: var(--spacing-xl);
+	}
+
+	.text-block--center {
+		text-align: center;
+	}
+
+	/* :global() because `Container` renders this class on an element outside this component's scoped-CSS boundary. */
+	.text-block--center :global(.text-block__inner) {
+		margin-inline: auto;
+	}
+
+	.text-block__title {
+		margin: 0 0 var(--spacing-sm);
+		font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+		line-height: 1.15;
+	}
+
+	.text-block__description {
+		margin: 0 0 var(--spacing-md);
+		color: var(--color-text-muted);
+		font-size: 1.1rem;
+	}
+
+	.text-block__paragraph {
+		margin: 0;
+		color: var(--color-text);
+		line-height: 1.7;
+	}
+</style>

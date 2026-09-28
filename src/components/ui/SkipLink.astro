@@ -1,0 +1,37 @@
+---
+/**
+ * "Skip to main content" link — the very first focusable element on every
+ * page. Invisible until it receives keyboard focus (Tab), at which point it
+ * appears at the top-left so keyboard/screen-reader users can jump straight
+ * past the header/nav into `<main id="main-content">` instead of tabbing
+ * through every nav link on every page load.
+ */
+export interface Props {
+	label?: string;
+	/** Must match the `id` of the target landmark (see `BusinessLayout.astro`'s `<main>`). */
+	targetId?: string;
+}
+
+const { label = 'Saltar al contenido principal', targetId = 'main-content' } = Astro.props;
+---
+
+<a href={`#${targetId}`} class="skip-link">{label}</a>
+
+<style>
+	.skip-link {
+		position: absolute;
+		top: -3rem;
+		left: 1rem;
+		z-index: 1000;
+		padding: 0.75rem 1.25rem;
+		border-radius: var(--radius-base);
+		background-color: var(--color-primary);
+		color: var(--color-background);
+		font-weight: 600;
+		transition: top 0.2s ease;
+	}
+
+	.skip-link:focus {
+		top: 1rem;
+	}
+</style>

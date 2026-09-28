@@ -1,0 +1,73 @@
+---
+import Container from '../ui/Container.astro';
+import IconLinks, { type IconLinkItem } from '../ui/IconLinks.astro';
+import BrandMark from '../ui/BrandMark.astro';
+import { business } from '../../config/business';
+import { mainNavigation } from '../../config/navigation';
+import { getHeaderIconLinks } from '../../lib/iconLinks';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import NavMenu from './NavMenu.astro';
+
+export interface Props extends BackgroundProps {
+	logo?: string;
+	logoAlt?: string;
+	/** Social/contact/WhatsApp icons shown on the right. Defaults to configured social links + WhatsApp. */
+	iconLinks?: IconLinkItem[];
+}
+
+const {
+	logo = business.logo,
+	logoAlt = business.name,
+	iconLinks = getHeaderIconLinks(),
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<header class="header-simple" style={style}>
+	<Container class="header-simple__inner">
+		<a href="/" class="header-simple__brand">
+			<BrandMark logo={logo} logoAlt={logoAlt} class="header-simple__logo" />
+		</a>
+		<nav class="header-simple__nav" aria-label="Navegación principal">
+			<NavMenu items={mainNavigation} />
+		</nav>
+		<IconLinks items={iconLinks} size={18} class="header-simple__icon-links" />
+	</Container>
+</header>
+
+<style>
+	.header-simple {
+		position: relative;
+	}
+
+	:global(.header-simple__inner) {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-block: var(--spacing-sm);
+	}
+
+	.header-simple__brand {
+		font-weight: bold;
+		font-size: 1.25rem;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `BrandMark` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.header-simple__logo) {
+		height: 2.25rem;
+		width: auto;
+	}
+
+	:global(.header-simple__icon-links) {
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+	}
+
+	@media (max-width: 640px) {
+		:global(.header-simple__icon-links) {
+			display: none;
+		}
+	}
+</style>

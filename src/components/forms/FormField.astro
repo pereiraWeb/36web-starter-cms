@@ -1,0 +1,137 @@
+---
+/** Reusable labeled input/textarea with a slot for validation errors. Used by `ContactForm`. */
+export interface Props {
+	type?: 'text' | 'email' | 'tel' | 'textarea';
+	name: string;
+	label: string;
+	placeholder?: string;
+	required?: boolean;
+	rows?: number;
+	/** Enforced client-side as a UX hint only; the server re-checks the same limit authoritatively. */
+	maxLength?: number;
+	/**
+	 * Browser autofill hint (skipped for `type="textarea"`, where it isn't useful).
+	 * Defaults based on `name` when not set explicitly: `name` → "name",
+	 * `email` → "email", `phone` → "tel", `company` → "organization".
+	 */
+	autocomplete?: string;
+	/** Visually hides the label (kept for screen readers) and relies on the placeholder instead. */
+	hideLabel?: boolean;
+	class?: string;
+}
+
+/** Sensible `autocomplete` defaults keyed by the common contact-form field names. */
+const AUTOCOMPLETE_BY_FIELD_NAME: Record<string, string> = {
+	name: 'name',
+	email: 'email',
+	phone: 'tel',
+	company: 'organization',
+};
+
+const {
+	type = 'text',
+	name,
+	label,
+	placeholder,
+	required = false,
+	rows = 4,
+	maxLength,
+	autocomplete = AUTOCOMPLETE_BY_FIELD_NAME[name],
+	hideLabel = false,
+	class: className,
+} = Astro.props;
+
+const id = `field-${name}-${Math.random().toString(36).slice(2, 8)}`;
+const errorId = `${id}-error`;
+---
+
+<div class:list={['form-field', className]} data-field-name={name}>
+	<label class:list={['form-field__label', { 'form-field__label--hidden': hideLabel }]} for={id}>
+		{label}
+	</label>
+	{
+		type === 'textarea' ? (
+			<textarea
+				id={id}
+				name={name}
+				rows={rows}
+				placeholder={placeholder}
+				required={required}
+				maxlength={maxLength}
+				aria-describedby={errorId}
+			/>
+		) : (
+			<input
+				id={id}
+				type={type}
+				name={name}
+				placeholder={placeholder}
+				required={required}
+				maxlength={maxLength}
+				autocomplete={autocomplete}
+				aria-describedby={errorId}
+			/>
+		)
+	}
+	<p class="form-field__error" id={errorId} data-field-error hidden></p>
+</div>
+
+<style>
+	.form-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+
+	.form-field__label--hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.form-field input,
+	.form-field textarea {
+		font: inherit;
+		padding: 0.6rem;
+		/* `--color-text-muted` (not the fainter `--color-border`) so the field's
+		   boundary itself meets the ~3:1 non-text contrast a required control
+		   needs (WCAG 1.4.11), not just the border-color swap on focus. */
+		border: 1px solid var(--color-text-muted);
+		border-radius: var(--radius-base);
+		background-color: var(--color-background);
+		color: inherit;
+	}
+
+	.form-field input:focus,
+	.form-field textarea:focus {
+		outline: none;
+		border-color: var(--color-primary);
+	}
+
+	/* Stronger ring specifically for keyboard focus, on top of the border-color change above. */
+	.form-field input:focus-visible,
+	.form-field textarea:focus-visible {
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 30%, transparent);
+	}
+
+	.form-field input[aria-invalid='true'],
+	.form-field textarea[aria-invalid='true'] {
+		border-color: #dc2626;
+	}
+
+	.form-field__error {
+		margin: 0;
+		color: #dc2626;
+		font-size: 0.8rem;
+	}
+
+	.form-field__error[hidden] {
+		display: none;
+	}
+</style>

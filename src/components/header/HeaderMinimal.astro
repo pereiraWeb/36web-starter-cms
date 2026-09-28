@@ -1,0 +1,82 @@
+---
+import Container from '../ui/Container.astro';
+import IconLinks, { type IconLinkItem } from '../ui/IconLinks.astro';
+import BrandMark from '../ui/BrandMark.astro';
+import { business } from '../../config/business';
+import { headerContent } from '../../config/headerContent';
+import { getHeaderIconLinks } from '../../lib/iconLinks';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	linkText?: string;
+	linkHref?: string;
+	logo?: string;
+	logoAlt?: string;
+	/** Social/contact/WhatsApp icons shown on the right. Defaults to configured social links + WhatsApp. */
+	iconLinks?: IconLinkItem[];
+}
+
+const {
+	linkText = headerContent.minimal.linkText,
+	linkHref = headerContent.minimal.linkHref,
+	logo = business.logo,
+	logoAlt = business.name,
+	iconLinks = getHeaderIconLinks(),
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<header class="header-minimal" style={style}>
+	<Container class="header-minimal__inner">
+		<a href="/" class="header-minimal__brand">
+			<BrandMark logo={logo} logoAlt={logoAlt} class="header-minimal__logo" />
+		</a>
+		<div class="header-minimal__actions">
+			<IconLinks items={iconLinks} size={17} class="header-minimal__icon-links" />
+			<a class="header-minimal__link" href={linkHref}>{linkText}</a>
+		</div>
+	</Container>
+</header>
+
+<style>
+	:global(.header-minimal__inner) {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-block: var(--spacing-sm);
+	}
+
+	.header-minimal__brand {
+		font-weight: bold;
+		font-size: 1.15rem;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `BrandMark` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.header-minimal__logo) {
+		height: 2rem;
+		width: auto;
+	}
+
+	.header-minimal__link {
+		font-weight: 600;
+		color: var(--color-primary);
+	}
+
+	.header-minimal__actions {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-md);
+	}
+
+	:global(.header-minimal__icon-links) {
+		color: var(--color-text-muted);
+	}
+
+	@media (max-width: 480px) {
+		:global(.header-minimal__icon-links) {
+			display: none;
+		}
+	}
+</style>

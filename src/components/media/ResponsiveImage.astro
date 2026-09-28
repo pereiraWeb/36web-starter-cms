@@ -1,0 +1,87 @@
+---
+import { imageFallbacks } from '../../config/images';
+
+/**
+ * The single `<img>` wrapper used everywhere in the site (cards, team,
+ * testimonials, hero visuals, service photos...) instead of hand-rolling
+ * `loading`/`decoding`/`width`/`height` on every `<img>` tag.
+ *
+ * Why a custom component instead of `astro:assets`' `<Image>`: every photo
+ * here comes from a plain string path in a config file (`business.logo`,
+ * `team[].image`, `services[].image`...) that lives in `public/`, so
+ * non-technical users can replace a file and/or edit a config value without
+ * touching an import statement anywhere. `astro:assets` only optimizes
+ * images it can see in its build graph (i.e. imported from `src/`), and
+ * explicitly does *not* process `public/` files — adopting it project-wide
+ * would mean turning every one of those config values into a source-code
+ * import, which defeats the point of a config-driven starter. If a given
+ * project wants true build-time re-encoding/`srcset` generation for a
+ * specific big background/hero image, importing that one asset and using
+ * Astro's `<Image>`/`<Picture>` directly for it is a reasonable exception —
+ * this component intentionally stays a thin, predictable `<img>` wrapper.
+ *
+ * What this *does* still give you, for free, on every image in the site:
+ * - Explicit `width`/`height` so the browser reserves the right box before
+ *   the image loads (avoids layout shift, i.e. CLS) — required props here on
+ *   purpose, not optional, so it's hard to forget.
+ * - `loading="lazy"` + `decoding="async"` by default; set `priority` on the
+ *   *one* image that's your page's LCP candidate (typically a hero visual)
+ *   to flip that to `loading="eager"` + `fetchpriority="high"` instead.
+ * - A runtime fallback (`data-fallback-src`, handled by
+ *   `src/lib/imageFallback.ts`) so a broken/missing file swaps to a real
+ *   placeholder image instead of the browser's broken-image icon.
+ * - Optional `sizes`/`srcset` passthrough for the (rarer) case where you do
+ *   have multiple resolutions of a photo to offer.
+ */
+export interface Props {
+	src: string;
+	alt: string;
+	/** Intrinsic width in pixels — set the browser's aspect-ratio hint, not necessarily the final displayed size (CSS/`class` still controls that). */
+	width: number;
+	height: number;
+	class?: string;
+	/**
+	 * Marks this as the page's LCP (Largest Contentful Paint) candidate —
+	 * typically the main hero visual. Switches to `loading="eager"` and
+	 * `fetchpriority="high"` so the browser fetches it immediately instead of
+	 * waiting to discover it's needed. Use on at most one image per page.
+	 */
+	priority?: boolean;
+	/** Explicit override; normally derived from `priority` instead. */
+	loading?: 'lazy' | 'eager';
+	/** `"sync"` only makes sense for the LCP image on very fast connections — `"async"` (the default) is right almost always. */
+	decoding?: 'async' | 'sync' | 'auto';
+	sizes?: string;
+	srcset?: string;
+	/** Swapped in (once) if `src` fails to load. Defaults to the shared content-photo placeholder; pass `undefined` to disable. */
+	fallbackSrc?: string;
+}
+
+const {
+	src,
+	alt,
+	width,
+	height,
+	class: className,
+	priority = false,
+	loading = priority ? 'eager' : 'lazy',
+	decoding = 'async',
+	sizes,
+	srcset,
+	fallbackSrc = imageFallbacks.photo,
+} = Astro.props;
+---
+
+<img
+	src={src}
+	alt={alt}
+	width={width}
+	height={height}
+	class={className}
+	loading={loading}
+	decoding={decoding}
+	fetchpriority={priority ? 'high' : undefined}
+	sizes={sizes}
+	srcset={srcset}
+	data-fallback-src={fallbackSrc && fallbackSrc !== src ? fallbackSrc : undefined}
+/>

@@ -1,0 +1,23 @@
+---
+/** Reusable max-width wrapper. Drop-in replacement for `<div class="container">`. */
+export interface Props {
+	/** HTML tag to render. Defaults to `div`. */
+	as?: string;
+	/** Additional class name(s) to merge onto the wrapper. */
+	class?: string;
+	/** Use a narrower max-width, useful for text-heavy content. */
+	narrow?: boolean;
+}
+
+const { as: Tag = 'div', class: className, narrow = false } = Astro.props;
+---
+
+<Tag class:list={['container', { 'container--narrow': narrow }, className]}>
+	<slot />
+</Tag>
+
+<style>
+	.container--narrow {
+		max-width: 760px;
+	}
+</style>

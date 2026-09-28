@@ -1,0 +1,77 @@
+---
+import Icon from './Icon.astro';
+import { business } from '../../config/business';
+import { getWhatsappUrl } from '../../lib/whatsapp';
+
+/** Floating circular button (bottom-left) that opens a WhatsApp chat. */
+export interface Props {
+	/** Defaults to `business.phone`. Any format works; non-digits are stripped for the link. */
+	phone?: string;
+	/** Pre-filled message opened in the chat. */
+	message?: string;
+	/** Any valid CSS color. Defaults to `var(--color-primary)`. */
+	color?: string;
+	label?: string;
+	class?: string;
+}
+
+const {
+	phone = business.phone,
+	message = `Hola ${business.name}, tengo una pregunta.`,
+	color = 'var(--color-primary)',
+	label = 'Chatear por WhatsApp',
+	class: className,
+} = Astro.props;
+
+const href = phone ? getWhatsappUrl(phone, message) : undefined;
+---
+
+{
+	href && (
+		<a
+			class:list={['whatsapp-button', className]}
+			href={href}
+			target="_blank"
+			rel="noopener noreferrer"
+			aria-label={label}
+			style={`--whatsapp-button-color: ${color};`}
+		>
+			<Icon name="whatsapp" size={28} strokeWidth={2.25} />
+		</a>
+	)
+}
+
+<style>
+	.whatsapp-button {
+		position: fixed;
+		left: 1.25rem;
+		bottom: 1.25rem;
+		z-index: 50;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 3.5rem;
+		height: 3.5rem;
+		border-radius: 50%;
+		background-color: var(--whatsapp-button-color, var(--color-primary));
+		color: #fff;
+		box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.whatsapp-button:hover {
+		transform: translateY(-2px) scale(1.05);
+		box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
+	}
+
+	@media (max-width: 640px) {
+		.whatsapp-button {
+			left: 1rem;
+			bottom: 1rem;
+			width: 3.25rem;
+			height: 3.25rem;
+		}
+	}
+</style>

@@ -1,0 +1,69 @@
+---
+import Container from '../ui/Container.astro';
+import IconLinks, { type IconLinkItem } from '../ui/IconLinks.astro';
+import BrandMark from '../ui/BrandMark.astro';
+import { business } from '../../config/business';
+import { mainNavigation } from '../../config/navigation';
+import { getHeaderIconLinks } from '../../lib/iconLinks';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import NavMenu from './NavMenu.astro';
+
+export interface Props extends BackgroundProps {
+	logo?: string;
+	logoAlt?: string;
+	/** Social/contact/WhatsApp icons shown below the nav. Defaults to configured social links + WhatsApp. */
+	iconLinks?: IconLinkItem[];
+}
+
+const {
+	logo = business.logo,
+	logoAlt = business.name,
+	iconLinks = getHeaderIconLinks(),
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<header class="header-centered" style={style}>
+	<Container class="header-centered__inner">
+		<a href="/" class="header-centered__brand">
+			<BrandMark logo={logo} logoAlt={logoAlt} class="header-centered__logo" />
+		</a>
+		<nav class="header-centered__nav" aria-label="Navegación principal">
+			<NavMenu items={mainNavigation} align="center" />
+		</nav>
+		<IconLinks items={iconLinks} size={18} class="header-centered__icon-links" />
+	</Container>
+</header>
+
+<style>
+	.header-centered {
+		position: relative;
+	}
+
+	:global(.header-centered__inner) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--spacing-xs);
+		padding-block: var(--spacing-sm);
+		text-align: center;
+	}
+
+	.header-centered__brand {
+		font-weight: bold;
+		font-size: 1.35rem;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `BrandMark` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.header-centered__logo) {
+		height: 2.5rem;
+		width: auto;
+	}
+
+	:global(.header-centered__icon-links) {
+		color: var(--color-text-muted);
+		justify-content: center;
+	}
+</style>

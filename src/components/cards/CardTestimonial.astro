@@ -1,0 +1,83 @@
+---
+import Icon from '../ui/Icon.astro';
+import ResponsiveImage from '../media/ResponsiveImage.astro';
+import { imageFallbacks } from '../../config/images';
+
+export interface Props {
+	quote: string;
+	author: string;
+	role?: string;
+	avatar?: string;
+	/** 1-5 star rating. Omit to hide. */
+	rating?: number;
+}
+
+const { quote, author, role, avatar = imageFallbacks.photo, rating } = Astro.props;
+---
+
+<article class="card-testimonial">
+	{rating && (
+		<div class="card-testimonial__rating" aria-label={`${rating} out of 5 stars`}>
+			{Array.from({ length: 5 }).map((_, index) => (
+				<Icon name={index < rating ? 'star' : 'star-outline'} size={16} />
+			))}
+		</div>
+	)}
+	<p class="card-testimonial__quote">&ldquo;{quote}&rdquo;</p>
+	<div class="card-testimonial__author">
+		<ResponsiveImage class="card-testimonial__avatar" src={avatar} alt={author} width={44} height={44} />
+		<div>
+			<p class="card-testimonial__name">{author}</p>
+			{role && <p class="card-testimonial__role">{role}</p>}
+		</div>
+	</div>
+</article>
+
+<style>
+	.card-testimonial {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		padding: var(--spacing-md);
+		border-radius: var(--radius-base);
+		background-color: var(--color-surface);
+	}
+
+	.card-testimonial__rating {
+		display: flex;
+		gap: 0.15rem;
+		margin-bottom: var(--spacing-xs);
+		color: var(--color-primary);
+	}
+
+	.card-testimonial__quote {
+		flex: 1;
+		margin: 0 0 var(--spacing-sm);
+	}
+
+	.card-testimonial__author {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-sm);
+	}
+
+	/* :global() because the `<img>` is now rendered by the `ResponsiveImage` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.card-testimonial__avatar) {
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 50%;
+		object-fit: cover;
+		flex-shrink: 0;
+	}
+
+	.card-testimonial__name {
+		margin: 0;
+		font-weight: bold;
+	}
+
+	.card-testimonial__role {
+		margin: 0;
+		color: var(--color-text-muted);
+		font-size: 0.85rem;
+	}
+</style>

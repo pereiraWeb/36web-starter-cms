@@ -1,0 +1,93 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import { demoNavigation } from '../../config/navigation';
+import CardBasic from '../../components/cards/CardBasic.astro';
+import Breadcrumbs from '../../components/ui/Breadcrumbs.astro';
+import Section from '../../components/ui/Section.astro';
+
+const demoDescriptions: Record<string, string> = {
+	'Centered Hero': 'HeroCentered, ServicesGrid and TestimonialsMinimal.',
+	'Split Hero': 'HeroSplit, ServicesSplit and TeamGrid.',
+	'Background Hero': 'HeroBackground, ServicesShowcase and TestimonialsGrid.',
+	'Minimal Hero': 'HeroMinimal, ServicesList and FaqMinimal.',
+	'Stats Hero': 'HeroFeatures, ServicesIcon and TeamCompact.',
+	'Team Spotlight': 'HeroCentered, TeamSpotlight and TestimonialsCentered.',
+	'Testimonials Wall': 'HeroSplit (reverse), TestimonialsWall and FaqCards.',
+	'FAQ Focus': 'HeroMinimal, FaqAccordion, FaqTwoColumn and ContactMinimal.',
+	'Contact Cards': 'HeroBackground, ContactCards and FaqSplit.',
+	'Component Gallery': 'All 5 reusable card primitives side by side.',
+};
+---
+
+<BusinessLayout title="Component Demos" description="Browse 10 demo pages, each combining different reusable component variants from this starter." noindex>
+	<Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Demos' }]} />
+
+	<Section class="demos-hero" backgroundColor="var(--color-surface)" narrowContainer>
+		<span class="demos-hero__eyebrow">Starter kit</span>
+		<h1 class="demos-hero__title">Component Demos</h1>
+		<p class="demos-hero__description">
+			Ten example pages, each combining different Hero, Services, Team, Testimonials, FAQ and Contact variants so
+			you can see them in context before picking the ones you need.
+		</p>
+	</Section>
+
+	<Section class="demos-grid-section">
+		<div class="demos-grid">
+			{demoNavigation.map((demo) => (
+				<a class="demos-grid__link" href={demo.href}>
+					<CardBasic title={demo.label} description={demoDescriptions[demo.label] ?? ''} />
+				</a>
+			))}
+		</div>
+	</Section>
+</BusinessLayout>
+
+<style>
+	/* `.demos-hero`/`.demos-grid-section` are rendered by the shared <Section> component,
+	   so their root selector needs :global() to still match (Astro scopes styles to the
+	   template that renders the element, not the one that passes the class name). */
+	:global(.demos-hero) {
+		padding-block: var(--spacing-xl);
+		text-align: center;
+	}
+
+	:global(.demos-grid-section) {
+		padding-block: var(--spacing-xl);
+	}
+
+	.demos-hero__eyebrow {
+		display: inline-block;
+		margin-bottom: var(--spacing-xs);
+		color: var(--color-secondary);
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.demos-hero__title {
+		font-size: clamp(2rem, 4vw, 2.75rem);
+	}
+
+	.demos-hero__description {
+		max-width: 620px;
+		margin-inline: auto;
+		color: var(--color-text-muted);
+	}
+
+	.demos-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		gap: var(--spacing-md);
+	}
+
+	.demos-grid__link {
+		display: block;
+		border-radius: var(--radius-base);
+		transition: transform 0.2s ease;
+	}
+
+	.demos-grid__link:hover {
+		transform: translateY(-2px);
+	}
+</style>

@@ -1,0 +1,29 @@
+---
+import { TextImage } from '../components/media';
+import { TextBlock } from '../components/text';
+import HeroBackground from '../components/hero/HeroBackground.astro';
+import BusinessLayout from '../layouts/BusinessLayout.astro';
+import TeamGrid from '../components/team/TeamGrid.astro';
+---
+
+<BusinessLayout title="About Us" description="Learn more about our team and our story." >
+	<HeroBackground
+		align="center"
+		height="360px"
+		title="About Us"
+		description="Learn more about our team and our story."
+		showbutton={false}
+	/>
+	<TextImage
+		reverse
+		height="auto"
+		eyebrow="Our story"
+		title="Built around real people, not templates"
+		description="Every project starts with a conversation. We combine design, strategy and a bit of stubbornness to build things our clients are proud to show off."
+		ctaText="Meet the team"
+		ctaHref="#team"
+	/>
+	<TextBlock align="center" />
+	<TeamGrid />
+
+</BusinessLayout>

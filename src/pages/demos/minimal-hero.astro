@@ -1,0 +1,14 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroMinimal from '../../components/hero/HeroMinimal.astro';
+import { ServicesList } from '../../components/services';
+import { FaqMinimal } from '../../components/faq';
+---
+
+<BusinessLayout title="Demo: Minimal Hero" description="Demo page combining a minimal hero, a numbered services list and a minimal FAQ." noindex>
+	<DemoIntro title="Minimal Hero + Services List + FAQ Minimal" components={['HeroMinimal', 'ServicesList', 'FaqMinimal']} />
+	<HeroMinimal height="440px" />
+	<ServicesList />
+	<FaqMinimal backgroundColor="#f7f7f5" />
+</BusinessLayout>

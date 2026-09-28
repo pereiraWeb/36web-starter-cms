@@ -1,0 +1,62 @@
+---
+export interface Props {
+	title: string;
+	description: string;
+	/** Short glyph, letter or emoji rendered inside the badge. Defaults to the title's first letter. */
+	icon?: string;
+	/** Wraps the whole card in a link when provided, making the entire card clickable (not just the text). */
+	href?: string;
+}
+
+const { title, description, icon = title.charAt(0).toUpperCase(), href } = Astro.props;
+const Tag = href ? 'a' : 'article';
+---
+
+<Tag class="card-icon" href={href}>
+	<span class="card-icon__badge" aria-hidden="true">{icon}</span>
+	<h3 class="card-icon__title">{title}</h3>
+	<p class="card-icon__description">{description}</p>
+</Tag>
+
+<style>
+	.card-icon {
+		display: block;
+		height: 100%;
+		padding: var(--spacing-md);
+		border-radius: var(--radius-base);
+		background-color: var(--color-background);
+		border: 1px solid var(--color-border);
+		color: inherit;
+		text-decoration: none;
+		transition: border-color 0.2s ease, transform 0.2s ease;
+	}
+
+	.card-icon:hover {
+		border-color: var(--color-primary);
+		transform: translateY(-2px);
+	}
+
+	.card-icon__badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 3rem;
+		height: 3rem;
+		margin-bottom: var(--spacing-sm);
+		border-radius: var(--radius-base);
+		background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+		color: var(--color-primary);
+		font-size: 1.25rem;
+		font-weight: 700;
+	}
+
+	.card-icon__title {
+		margin: 0 0 0.5rem;
+		font-size: 1.15rem;
+	}
+
+	.card-icon__description {
+		margin: 0;
+		color: var(--color-text-muted);
+	}
+</style>

@@ -1,0 +1,116 @@
+---
+import Container from '../ui/Container.astro';
+import { ContactForm } from '../forms';
+import { MapEmbed } from '../media';
+import { CardContact } from '../cards';
+import { contactContent } from '../../config/contactContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+/**
+ * Two columns on desktop — form on the left, contact info card + map on the
+ * right — collapsing to a single column (form first) on mobile.
+ */
+export interface Props extends BackgroundProps {
+	title?: string;
+	submitText?: string;
+	/** Show the embedded map below the business details. Defaults to `true`. */
+	showMap?: boolean;
+}
+
+const {
+	title = contactContent.split.title,
+	submitText = contactContent.split.submitText,
+	showMap = true,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="contact-split" style={style}>
+	<Container class="contact-split__grid">
+		<ContactForm class="contact-split__form" submitText={submitText} placeholderLabels />
+		<div class="contact-split__info">
+			<CardContact title={title} />
+			{showMap && <MapEmbed class="contact-split__map" />}
+		</div>
+	</Container>
+</section>
+
+<style>
+	/* :global() because `Container`/`ContactForm`/`MapEmbed` render this class on an element outside this component's scoped-CSS boundary. */
+	/* No `align-items` override: Grid's default `stretch` makes both columns
+	   match the taller one's height, and the map below grows to fill the
+	   rest so the card + map column matches the form's total height. */
+	:global(.contact-split__grid) {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--spacing-xl);
+	}
+
+	/* Centers the fields vertically within the column when the info column ends up taller than the form's own content. */
+	:global(.contact-split__form) {
+		justify-content: center;
+	}
+
+	/* Minimal style: no boxed inputs, just an underline — labels are hidden
+	   visually (still read by screen readers, see `hideLabel` on `FormField`)
+	   and their text moves into the placeholder instead (`placeholderLabels`
+	   on `ContactForm`, set above). `!important` because this needs to beat
+	   `FormField.astro`'s own scoped border rule, which can otherwise tie or
+	   win on specificity depending on how Astro's per-page CSS gets chunked. */
+	:global(.contact-split__form .form-field input),
+	:global(.contact-split__form .form-field textarea) {
+		padding: 0.65rem 0 !important;
+		border: none !important;
+		border-bottom: 1px solid var(--color-text-muted) !important;
+		border-radius: 0 !important;
+		background: transparent !important;
+		box-shadow: none !important;
+	}
+
+	:global(.contact-split__form .form-field input:focus),
+	:global(.contact-split__form .form-field textarea:focus) {
+		outline: none !important;
+		border-color: var(--color-primary) !important;
+	}
+
+	/* Stronger cue for keyboard focus specifically, since these underline-only inputs have no box to ring. */
+	:global(.contact-split__form .form-field input:focus-visible),
+	:global(.contact-split__form .form-field textarea:focus-visible) {
+		background-color: color-mix(in srgb, var(--color-primary) 6%, transparent) !important;
+	}
+
+	:global(.contact-split__map) {
+		/* Overrides the fixed 16/9 ratio set inline by `MapEmbed` so it can grow to fill the leftover height instead. */
+		flex: 1;
+		min-height: 220px;
+		width: 100%;
+		aspect-ratio: auto !important;
+		border-radius: calc(var(--radius-base) * 1.5);
+		overflow: hidden;
+	}
+
+	.contact-split__info {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		gap: var(--spacing-sm);
+	}
+
+	@media (max-width: 768px) {
+		:global(.contact-split__grid) {
+			grid-template-columns: 1fr;
+		}
+
+		:global(.contact-split__map) {
+			flex: none;
+			aspect-ratio: 16 / 9 !important;
+		}
+
+		.contact-split__info {
+			height: auto;
+		}
+	}
+</style>

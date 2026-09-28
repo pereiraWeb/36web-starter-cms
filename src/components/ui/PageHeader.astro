@@ -1,0 +1,42 @@
+---
+import Container from './Container.astro';
+
+/**
+ * Lightweight page title used on pages that don't have a full Hero section
+ * (e.g. `about.astro`, `services.astro`) — every page needs exactly one
+ * `<h1>` for SEO/accessibility, and this is the simplest way to provide it
+ * when a big hero banner isn't appropriate.
+ */
+export interface Props {
+	title: string;
+	description?: string;
+	class?: string;
+}
+
+const { title, description, class: className } = Astro.props;
+---
+
+<header class:list={['page-header', className]}>
+	<Container>
+		<h1 class="page-header__title">{title}</h1>
+		{description && <p class="page-header__description">{description}</p>}
+	</Container>
+</header>
+
+<style>
+	.page-header {
+		padding-block: var(--spacing-lg) var(--spacing-md);
+	}
+
+	.page-header__title {
+		font-size: clamp(1.85rem, 4vw, 2.5rem);
+		line-height: 1.2;
+	}
+
+	.page-header__description {
+		max-width: 640px;
+		margin-bottom: 0;
+		color: var(--color-text-muted);
+		font-size: 1.05rem;
+	}
+</style>

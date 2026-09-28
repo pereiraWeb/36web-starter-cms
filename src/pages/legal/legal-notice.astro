@@ -1,0 +1,39 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { business } from '../../config/business';
+---
+
+<LegalLayout title="Aviso legal" description="Información legal sobre esta web y su titular." breadcrumbLabel="Aviso legal">
+	<h2>Titular del sitio web</h2>
+	<p>En cumplimiento del deber de información, se indican a continuación los datos identificativos del titular de este sitio web:</p>
+	<ul>
+		<li>Denominación social: {business.legalName}</li>
+		<li>NIF/CIF: [NIF/CIF DE LA EMPRESA]</li>
+		<li>
+			Domicilio: {business.address.street}, {business.address.postalCode} {business.address.city}, {business.address.country}
+		</li>
+		<li>Correo electrónico: {business.email}</li>
+		<li>Teléfono: {business.phone}</li>
+		<li>Datos registrales: [DATOS DE INSCRIPCIÓN EN EL REGISTRO MERCANTIL U ORGANISMO EQUIVALENTE, SI APLICA]</li>
+	</ul>
+
+	<h2>Objeto</h2>
+	<p>[DESCRIBE AQUÍ LA ACTIVIDAD REAL DE LA EMPRESA Y LA FINALIDAD DE ESTE SITIO WEB.]</p>
+
+	<h2>Condiciones de uso</h2>
+	<p>
+		[SUSTITUIR POR EL TEXTO REAL SOBRE LAS CONDICIONES DE USO DEL SITIO, RESPONSABILIDAD SOBRE LOS CONTENIDOS,
+		ENLACES A TERCEROS, ETC., ADAPTADO A LA LEGISLACIÓN APLICABLE A TU PAÍS (POR EJEMPLO, LA LSSI-CE EN ESPAÑA).]
+	</p>
+
+	<h2>Propiedad intelectual</h2>
+	<p>
+		[SUSTITUIR POR EL TEXTO REAL SOBRE LA TITULARIDAD DE MARCAS, LOGOTIPOS, TEXTOS, IMÁGENES Y DEMÁS CONTENIDOS DE
+		ESTE SITIO WEB, ASÍ COMO LAS CONDICIONES DE USO DE DICHOS CONTENIDOS POR TERCEROS.]
+	</p>
+
+	<h2>Legislación y jurisdicción aplicable</h2>
+	<p>[INDICAR LA LEGISLACIÓN Y EL FUERO/JURISDICCIÓN APLICABLES EN CASO DE CONTROVERSIA.]</p>
+
+	<p>Para cualquier consulta legal, puedes escribirnos a {business.email}.</p>
+</LegalLayout>

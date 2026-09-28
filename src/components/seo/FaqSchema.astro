@@ -1,0 +1,33 @@
+---
+export interface FaqSchemaItem {
+	question: string;
+	answer: string;
+}
+
+export interface Props {
+	/**
+	 * Must match FAQ content that's actually visible on this same page —
+	 * Google's guidelines disallow `FAQPage` markup for content the visitor
+	 * can't also see. Don't add this to a page unless it renders a matching
+	 * FAQ component (e.g. `<FaqAccordion />`).
+	 */
+	items: FaqSchemaItem[];
+}
+
+const { items } = Astro.props;
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: items.map((item) => ({
+		'@type': 'Question',
+		name: item.question,
+		acceptedAnswer: {
+			'@type': 'Answer',
+			text: item.answer,
+		},
+	})),
+};
+---
+
+{items.length > 0 && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />}

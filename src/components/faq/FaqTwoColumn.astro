@@ -1,0 +1,74 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { faqs, faqContent } from '../../config/faqContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = faqContent.twoColumn.eyebrow,
+	title = faqContent.twoColumn.title,
+	description = faqContent.twoColumn.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="faq-two-column" style={style}>
+	<Container>
+		<div class="faq-two-column__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<div class="faq-two-column__grid">
+			{faqs.map((faq) => (
+				<div class="faq-two-column__item">
+					<h3>{faq.question}</h3>
+					<p>{faq.answer}</p>
+				</div>
+			))}
+		</div>
+	</Container>
+</section>
+
+<style>
+	.faq-two-column__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+		text-align: center;
+		margin-inline: auto;
+	}
+
+
+	.faq-two-column__grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: var(--spacing-lg) var(--spacing-xl);
+	}
+
+	.faq-two-column__item h3 {
+		margin: 0 0 0.35rem;
+		font-size: 1.05rem;
+	}
+
+	.faq-two-column__item p {
+		margin: 0;
+		color: var(--color-text-muted);
+	}
+
+	@media (max-width: 640px) {
+		.faq-two-column__grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

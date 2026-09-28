@@ -1,0 +1,157 @@
+---
+import Container from '../../components/ui/Container.astro';
+import IconLinks from '../../components/ui/IconLinks.astro';
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroMinimal from '../../components/hero/HeroMinimal.astro';
+import CardBasic from '../../components/cards/CardBasic.astro';
+import CardIcon from '../../components/cards/CardIcon.astro';
+import CardImage from '../../components/cards/CardImage.astro';
+import CardProfile from '../../components/cards/CardProfile.astro';
+import CardTestimonial from '../../components/cards/CardTestimonial.astro';
+import { getContactIconLinks } from '../../lib/iconLinks';
+
+const demoIconLinks = [
+	{ icon: 'facebook' as const, href: 'https://facebook.com', label: 'Facebook' },
+	{ icon: 'instagram' as const, href: 'https://instagram.com', label: 'Instagram' },
+	{ icon: 'linkedin' as const, href: 'https://linkedin.com', label: 'LinkedIn' },
+	{ icon: 'twitter' as const, href: 'https://twitter.com', label: 'Twitter' },
+];
+---
+
+<BusinessLayout title="Demo: Component Gallery" description="A gallery of all the reusable card components available in this starter." noindex>
+	<DemoIntro
+		title="Reusable Card Gallery"
+		components={['CardBasic', 'CardIcon', 'CardImage', 'CardProfile', 'CardTestimonial', 'IconLinks']}
+	/>
+	<HeroMinimal
+		tag="Starter kit"
+		title="Every card, side by side"
+		description="These five card primitives power the Services, Team, Testimonials and FAQ component families. Mix and match them anywhere."
+		ctaText="Back to home"
+		ctaHref="/"
+		highlights={[]}
+		height="320px"
+	/>
+
+	<section class="gallery-section">
+		<Container>
+			<h2 class="gallery-section__title">CardBasic</h2>
+			<div class="gallery-grid gallery-grid--3">
+				<CardBasic eyebrow="Popular" title="Web Design" description="Modern, responsive websites built for conversion." />
+				<CardBasic title="SEO" description="On-page and technical SEO to help you rank higher." />
+				<CardBasic title="Branding" description="Visual identity systems that make your business memorable." />
+			</div>
+		</Container>
+	</section>
+
+	<section class="gallery-section gallery-section--alt">
+		<Container>
+			<h2 class="gallery-section__title">CardIcon</h2>
+			<div class="gallery-grid gallery-grid--3">
+				<CardIcon icon="⚡" title="Fast delivery" description="Projects shipped in weeks, not months." />
+				<CardIcon icon="🔒" title="Secure by default" description="Best practices baked into every build." />
+				<CardIcon title="Support" description="Defaults to the first letter when no icon is given." />
+			</div>
+		</Container>
+	</section>
+
+	<section class="gallery-section">
+		<Container>
+			<h2 class="gallery-section__title">CardImage</h2>
+			<div class="gallery-grid gallery-grid--3">
+				<CardImage tag="Featured" title="Brand Refresh" description="A full identity overhaul for a growing retailer." ctaText="View case study" />
+				<CardImage title="Product Launch" description="Landing page and campaign assets for a new product line." />
+				<CardImage title="App Design" description="Falls back to a gradient placeholder when no image is set." />
+			</div>
+		</Container>
+	</section>
+
+	<section class="gallery-section gallery-section--alt">
+		<Container>
+			<h2 class="gallery-section__title">CardProfile</h2>
+			<div class="gallery-grid gallery-grid--3">
+				<CardProfile name="Alex Rivera" role="Founder & CEO" bio="Leads strategy and client relationships." />
+				<CardProfile name="Jamie Chen" role="Lead Designer" bio="Designs every interface pixel by pixel." />
+				<CardProfile name="Sam Okafor" role="Engineering Lead" />
+			</div>
+		</Container>
+	</section>
+
+	<section class="gallery-section">
+		<Container>
+			<h2 class="gallery-section__title">CardTestimonial</h2>
+			<div class="gallery-grid gallery-grid--3">
+				<CardTestimonial quote="They completely transformed how customers see our brand." author="Morgan Lee" role="CMO, Retail Co." rating={5} />
+				<CardTestimonial quote="Delivered on time and exceeded expectations." author="Priya Nair" role="Operations Director" />
+				<CardTestimonial quote="A genuine partner, not just a vendor." author="Diego Fernandez" />
+			</div>
+		</Container>
+	</section>
+
+	<section class="gallery-section gallery-section--alt">
+		<Container>
+			<h2 class="gallery-section__title">IconLinks</h2>
+			<p class="gallery-section__description">
+				Pick any combination of social, contact or WhatsApp icons. Any number of items, row or column layout,
+				any gap and any color &mdash; used in the header, but reusable anywhere on the page.
+			</p>
+			<div class="gallery-grid gallery-grid--3">
+				<div class="icon-links-demo">
+					<h3>Row, default color</h3>
+					<IconLinks items={demoIconLinks} direction="row" />
+				</div>
+				<div class="icon-links-demo">
+					<h3>Column, custom color + gap</h3>
+					<IconLinks items={demoIconLinks} direction="column" gap="1rem" color="var(--color-primary)" size={22} />
+				</div>
+				<div class="icon-links-demo">
+					<h3>Contact + WhatsApp</h3>
+					<IconLinks items={getContactIconLinks()} direction="row" gap="1.25rem" size={24} />
+				</div>
+			</div>
+		</Container>
+	</section>
+</BusinessLayout>
+
+<style>
+	.gallery-section {
+		padding-block: var(--spacing-xl);
+	}
+
+	.gallery-section--alt {
+		background-color: var(--color-surface);
+	}
+
+	.gallery-section__title {
+		margin-bottom: var(--spacing-md);
+		font-size: 1.5rem;
+	}
+
+	.gallery-grid {
+		display: grid;
+		gap: var(--spacing-md);
+	}
+
+	.gallery-grid--3 {
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	}
+
+	.gallery-section__description {
+		max-width: 640px;
+		margin-bottom: var(--spacing-md);
+		color: var(--color-text-muted);
+	}
+
+	.icon-links-demo {
+		padding: var(--spacing-md);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-base);
+		background-color: var(--color-background);
+	}
+
+	.icon-links-demo h3 {
+		margin: 0 0 var(--spacing-sm);
+		font-size: 1rem;
+	}
+</style>

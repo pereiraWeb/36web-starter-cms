@@ -1,0 +1,50 @@
+---
+import { formStatusMessages } from '../../config/formContent';
+
+/** Success/error feedback region toggled by `ContactForm`'s submit script. */
+export interface Props {
+	successMessage?: string;
+	errorMessage?: string;
+	class?: string;
+}
+
+const {
+	successMessage = formStatusMessages.success,
+	errorMessage = formStatusMessages.error,
+	class: className,
+} = Astro.props;
+---
+
+<p
+	class:list={['form-status', className]}
+	data-form-status
+	data-success-message={successMessage}
+	data-error-message={errorMessage}
+	role="status"
+	aria-live="polite"
+	tabindex="-1"
+	hidden
+></p>
+
+<style>
+	.form-status {
+		margin: 0;
+		padding: 0.65rem 0.9rem;
+		border-radius: var(--radius-base);
+		font-size: 0.9rem;
+	}
+
+	.form-status[hidden] {
+		display: none;
+	}
+
+	.form-status[data-state='success'] {
+		background-color: color-mix(in srgb, #16a34a 14%, transparent);
+		color: #15803d;
+	}
+
+	.form-status[data-state='error'] {
+		background-color: color-mix(in srgb, #dc2626 12%, transparent);
+		color: #b91c1c;
+	}
+</style>

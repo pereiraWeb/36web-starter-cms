@@ -1,0 +1,59 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardProfile from '../cards/CardProfile.astro';
+import { team, teamContent } from '../../config/teamContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = teamContent.grid.eyebrow,
+	title = teamContent.grid.title,
+	description = teamContent.grid.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="team-grid" style={style}>
+	<Container>
+		<div class="team-grid__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="team-grid__list">
+			{team.map((member) => (
+				<li>
+					<CardProfile name={member.name} role={member.role} bio={member.bio} image={member.image} />
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.team-grid__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+	}
+
+
+	.team-grid__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>

@@ -1,0 +1,112 @@
+---
+import Container from '../ui/Container.astro';
+import IconLinks, { type IconLinkItem } from '../ui/IconLinks.astro';
+import BrandMark from '../ui/BrandMark.astro';
+import { business } from '../../config/business';
+import { mainNavigation } from '../../config/navigation';
+import { headerContent } from '../../config/headerContent';
+import { getHeaderIconLinks } from '../../lib/iconLinks';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import NavMenu from './NavMenu.astro';
+
+export interface Props extends BackgroundProps {
+	message?: string;
+	logo?: string;
+	logoAlt?: string;
+	/** Social/contact/WhatsApp icons shown on the right of the main bar. Defaults to configured social links + WhatsApp. */
+	iconLinks?: IconLinkItem[];
+}
+
+const {
+	message = headerContent.topBar.message,
+	logo = business.logo,
+	logoAlt = business.name,
+	iconLinks = getHeaderIconLinks(),
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<header class="header-topbar" style={style}>
+	<div class="header-topbar__bar">
+		<Container class="header-topbar__bar-inner">
+			<span>{message}</span>
+			<span class="header-topbar__contact">{business.phone} &middot; {business.email}</span>
+		</Container>
+	</div>
+	<Container class="header-topbar__main">
+		<a href="/" class="header-topbar__brand">
+			<BrandMark logo={logo} logoAlt={logoAlt} class="header-topbar__logo" />
+		</a>
+		<nav class="header-topbar__nav" aria-label="Navegación principal">
+			<NavMenu items={mainNavigation} />
+		</nav>
+		<IconLinks items={iconLinks} size={18} class="header-topbar__icon-links" />
+	</Container>
+</header>
+
+<style>
+	.header-topbar {
+		position: relative;
+	}
+
+	.header-topbar__bar {
+		background-color: var(--color-primary);
+		color: var(--color-background);
+		font-size: 0.85rem;
+	}
+
+	:global(.header-topbar__bar-inner) {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: var(--spacing-sm);
+		padding-block: 0.4rem;
+	}
+
+	.header-topbar__contact {
+		opacity: 0.85;
+	}
+
+	:global(.header-topbar__main) {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-block: var(--spacing-sm);
+	}
+
+	.header-topbar__brand {
+		font-weight: bold;
+		font-size: 1.25rem;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `BrandMark` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.header-topbar__logo) {
+		height: 2.25rem;
+		width: auto;
+	}
+
+	.header-topbar__nav ul {
+		display: flex;
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	:global(.header-topbar__icon-links) {
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+	}
+
+	@media (max-width: 640px) {
+		.header-topbar__contact {
+			display: none;
+		}
+
+		:global(.header-topbar__icon-links) {
+			display: none;
+		}
+	}
+</style>

@@ -1,0 +1,58 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardBasic from '../cards/CardBasic.astro';
+import { services, servicesContent, getServiceHref } from '../../config/servicesContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = servicesContent.grid.eyebrow,
+	title = servicesContent.grid.title,
+	description = servicesContent.grid.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="services-grid" style={style}>
+	<Container>
+		<div class="services-grid__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="services-grid__list">
+			{services.map((service) => (
+				<li>
+					<CardBasic title={service.title} description={service.description} href={getServiceHref(service)} />
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.services-grid__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+	}
+
+	.services-grid__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>

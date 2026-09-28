@@ -1,0 +1,14 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroBackground from '../../components/hero/HeroBackground.astro';
+import { ContactCards } from '../../components/contact';
+import { FaqSplit } from '../../components/faq';
+---
+
+<BusinessLayout title="Demo: Contact Cards" description="Demo page combining a background hero with contact info cards and a FAQ split section." noindex>
+	<DemoIntro title="Background Hero + Contact Cards + FAQ Split" components={['HeroBackground', 'ContactCards', 'FaqSplit']} />
+	<HeroBackground align="center" height="420px" backgroundColor="#1f2937" />
+	<ContactCards />
+	<FaqSplit backgroundColor="#f7f7f5" />
+</BusinessLayout>

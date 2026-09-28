@@ -1,0 +1,90 @@
+---
+import Container from '../ui/Container.astro';
+import AgencyCredit from '../ui/AgencyCredit.astro';
+import BrandMark from '../ui/BrandMark.astro';
+import { business } from '../../config/business';
+import { legalNavigation } from '../../config/navigation';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	logo?: string;
+	logoAlt?: string;
+}
+
+const { logo = business.logo, logoAlt = business.name, backgroundColor, backgroundImage } = Astro.props;
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+const year = new Date().getFullYear();
+---
+
+<footer class="footer-minimal-bar" style={style}>
+	<Container class="footer-minimal-bar__inner">
+		<div class="footer-minimal-bar__brand-group">
+			{logo && (
+				<a href="/" class="footer-minimal-bar__brand">
+					<BrandMark logo={logo} logoAlt={logoAlt} class="footer-minimal-bar__logo" fallbackToText={false} />
+				</a>
+			)}
+			<span>&copy; {year} {business.name}</span>
+		</div>
+		<div class="footer-minimal-bar__end">
+			<AgencyCredit />
+			<ul>
+				{legalNavigation.map((item) => (
+					<li><a href={item.href}>{item.label}</a></li>
+				))}
+			</ul>
+		</div>
+	</Container>
+</footer>
+
+<style>
+	.footer-minimal-bar {
+		border-top: 1px solid var(--color-border);
+	}
+
+	:global(.footer-minimal-bar__inner) {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: var(--spacing-sm);
+		padding-block: var(--spacing-xs);
+		color: var(--color-text-muted);
+		font-size: 0.85rem;
+	}
+
+	:global(.footer-minimal-bar__inner) ul {
+		display: flex;
+		gap: var(--spacing-sm);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.footer-minimal-bar__brand-group {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-xs);
+	}
+
+	.footer-minimal-bar__brand {
+		display: inline-flex;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `BrandMark` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.footer-minimal-bar__logo) {
+		height: 1.35rem;
+		width: auto;
+	}
+
+	.footer-minimal-bar__end {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--spacing-sm);
+	}
+
+	.footer-minimal-bar__end :global(.agency-credit) {
+		font-size: inherit;
+		color: inherit;
+	}
+</style>

@@ -1,0 +1,71 @@
+---
+import Container from '../ui/Container.astro';
+import { testimonials, testimonialsContent } from '../../config/testimonialsContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = testimonialsContent.minimal.title,
+	description = testimonialsContent.minimal.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="testimonials-minimal" style={style}>
+	<Container>
+		<div class="testimonials-minimal__header">
+			<h2>{title}</h2>
+			{description && <p class="testimonials-minimal__description">{description}</p>}
+		</div>
+		<ul class="testimonials-minimal__list">
+			{testimonials.map((testimonial) => (
+				<li class="testimonials-minimal__item">
+					<p class="testimonials-minimal__quote">&ldquo;{testimonial.quote}&rdquo;</p>
+					<p class="testimonials-minimal__author">
+						{testimonial.author}{testimonial.role && <span> &mdash; {testimonial.role}</span>}
+					</p>
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.testimonials-minimal__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-md);
+	}
+
+	.testimonials-minimal__description {
+		color: var(--color-text-muted);
+	}
+
+	.testimonials-minimal__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.testimonials-minimal__item {
+		padding-block: var(--spacing-md);
+		border-top: 1px solid var(--color-border);
+	}
+
+	.testimonials-minimal__quote {
+		margin: 0 0 0.35rem;
+		font-size: 1.1rem;
+	}
+
+	.testimonials-minimal__author {
+		margin: 0;
+		color: var(--color-text-muted);
+		font-weight: 600;
+	}
+</style>

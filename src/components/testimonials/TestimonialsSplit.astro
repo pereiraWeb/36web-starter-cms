@@ -1,0 +1,102 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardTestimonial from '../cards/CardTestimonial.astro';
+import { testimonials, testimonialsContent } from '../../config/testimonialsContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	statValue?: string;
+	statLabel?: string;
+}
+
+const {
+	eyebrow = testimonialsContent.split.eyebrow,
+	title = testimonialsContent.split.title,
+	description = testimonialsContent.split.description,
+	statValue = testimonialsContent.split.statValue,
+	statLabel = testimonialsContent.split.statLabel,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="testimonials-split" style={style}>
+	<Container class="testimonials-split__inner">
+		<div class="testimonials-split__content">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+			{statValue && (
+				<div class="testimonials-split__stat">
+					<span class="testimonials-split__stat-value">{statValue}</span>
+					<span class="testimonials-split__stat-label">{statLabel}</span>
+				</div>
+			)}
+		</div>
+		<ul class="testimonials-split__list">
+			{testimonials.map((testimonial) => (
+				<li>
+					<CardTestimonial
+						quote={testimonial.quote}
+						author={testimonial.author}
+						role={testimonial.role}
+						avatar={testimonial.avatar}
+						rating={testimonial.rating}
+					/>
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	:global(.testimonials-split__inner) {
+		display: grid;
+		grid-template-columns: 0.8fr 1.2fr;
+		gap: var(--spacing-xl);
+		align-items: start;
+	}
+
+
+	.testimonials-split__stat {
+		display: flex;
+		flex-direction: column;
+		margin-top: var(--spacing-md);
+		padding-top: var(--spacing-md);
+		border-top: 1px solid var(--color-border);
+	}
+
+	.testimonials-split__stat-value {
+		font-size: 2rem;
+		font-weight: 700;
+		color: var(--color-primary);
+	}
+
+	.testimonials-split__stat-label {
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+	}
+
+	.testimonials-split__list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	@media (max-width: 768px) {
+		:global(.testimonials-split__inner) {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

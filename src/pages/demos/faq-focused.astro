@@ -1,0 +1,15 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroMinimal from '../../components/hero/HeroMinimal.astro';
+import { FaqAccordion, FaqTwoColumn } from '../../components/faq';
+import { ContactMinimal } from '../../components/contact';
+---
+
+<BusinessLayout title="Demo: FAQ Focus" description="Demo page combining a minimal hero with two different FAQ layouts and a minimal contact form." noindex>
+	<DemoIntro title="FAQ Accordion + FAQ Two Column" components={['HeroMinimal', 'FaqAccordion', 'FaqTwoColumn', 'ContactMinimal']} />
+	<HeroMinimal height="380px" />
+	<FaqAccordion />
+	<FaqTwoColumn backgroundColor="#f4f6ff" />
+	<ContactMinimal />
+</BusinessLayout>

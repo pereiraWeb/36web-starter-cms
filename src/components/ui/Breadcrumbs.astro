@@ -1,0 +1,99 @@
+---
+import Container from './Container.astro';
+import Icon from './Icon.astro';
+import { business } from '../../config/business';
+
+export interface BreadcrumbItem {
+	label: string;
+	/** Omit on the last (current) item. */
+	href?: string;
+}
+
+export interface Props {
+	items: BreadcrumbItem[];
+	class?: string;
+}
+
+const { items, class: className } = Astro.props;
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	// Resolved against `business.siteUrl` (not `Astro.site`, which would
+	// silently fall back to a placeholder domain if ever unset) so the URLs
+	// in this JSON-LD always match the real canonical domain.
+	itemListElement: items.map((item, index) => ({
+		'@type': 'ListItem',
+		position: index + 1,
+		name: item.label,
+		...(item.href ? { item: new URL(item.href, business.siteUrl).toString() } : {}),
+	})),
+};
+---
+
+<nav class:list={['breadcrumbs', className]} aria-label="Migas de pan">
+	<Container>
+		<ol class="breadcrumbs__list">
+			{
+				items.map((item, index) => {
+					const isLast = index === items.length - 1;
+					return (
+						<li class="breadcrumbs__item">
+							{item.href && !isLast ? (
+								<a href={item.href}>{item.label}</a>
+							) : (
+								<span aria-current="page">{item.label}</span>
+							)}
+							{!isLast && <Icon name="chevron-right" size={14} class="breadcrumbs__separator" />}
+						</li>
+					);
+				})
+			}
+		</ol>
+	</Container>
+</nav>
+<script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+
+<style>
+	.breadcrumbs {
+		padding-block: var(--spacing-sm);
+		border-bottom: 1px solid var(--color-border);
+		background-color: var(--color-surface);
+	}
+
+	.breadcrumbs__list {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-size: 0.875rem;
+		color: var(--color-text-muted);
+	}
+
+	.breadcrumbs__item {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.breadcrumbs__item a {
+		color: var(--color-text-muted);
+	}
+
+	.breadcrumbs__item a:hover {
+		color: var(--color-primary);
+		text-decoration: underline;
+	}
+
+	.breadcrumbs__item span[aria-current] {
+		color: var(--color-text);
+		font-weight: 600;
+	}
+
+	.breadcrumbs__separator {
+		opacity: 0.6;
+	}
+</style>

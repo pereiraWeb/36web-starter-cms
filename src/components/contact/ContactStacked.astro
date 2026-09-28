@@ -1,0 +1,88 @@
+---
+import Container from '../ui/Container.astro';
+import CardIcon from '../cards/CardIcon.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { ContactForm } from '../forms';
+import { business } from '../../config/business';
+import { contactContent } from '../../config/contactContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	submitText?: string;
+}
+
+const {
+	eyebrow = contactContent.stacked.eyebrow,
+	title = contactContent.stacked.title,
+	description = contactContent.stacked.description,
+	submitText = contactContent.stacked.submitText,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+const infoCards = [
+	{ icon: '#', title: contactContent.stacked.phoneLabel, description: business.phone },
+	{ icon: '@', title: contactContent.stacked.emailLabel, description: business.email },
+	{ icon: '◎', title: contactContent.stacked.addressLabel, description: business.address.city },
+];
+---
+
+<section class="contact-stacked" style={style}>
+	<Container>
+		<div class="contact-stacked__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="contact-stacked__info">
+			{infoCards.map((card) => (
+				<li>
+					<CardIcon title={card.title} description={card.description} icon={card.icon} />
+				</li>
+			))}
+		</ul>
+		<ContactForm class="contact-stacked__form" submitText={submitText} inlineNameEmail />
+	</Container>
+</section>
+
+<style>
+	.contact-stacked {
+		background-color: var(--color-surface);
+	}
+
+	.contact-stacked__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+		text-align: center;
+		margin-inline: auto;
+	}
+
+
+	.contact-stacked__info {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0 auto var(--spacing-lg);
+		padding: 0;
+		max-width: 800px;
+	}
+
+	:global(.contact-stacked__form) {
+		max-width: 640px;
+		margin-inline: auto;
+		padding: var(--spacing-lg);
+		border-radius: var(--radius-base);
+		background-color: var(--color-background);
+	}
+
+	:global(.contact-stacked__submit) {
+		align-self: flex-start;
+	}
+</style>

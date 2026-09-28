@@ -1,0 +1,40 @@
+---
+import BusinessLayout from './BusinessLayout.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import ServiceSchema from '../components/seo/ServiceSchema.astro';
+import type { Service } from '../config/servicesContent';
+import type { SeoProps } from '../lib/seo';
+
+/**
+ * For individual service detail pages (`src/pages/services/[slug].astro`,
+ * and any future service-related page, e.g. a case study) — wraps
+ * `BusinessLayout` with the `Service` JSON-LD and the Home > Services >
+ * {service} breadcrumb trail, so that wiring only needs to happen once.
+ */
+export interface Props extends Omit<SeoProps, 'title' | 'description'> {
+	service: Service;
+	/** SEO title override. Defaults to `service.title`. */
+	title?: string;
+	/** SEO description override. Defaults to `service.description`. */
+	description?: string;
+	/** Label for the "Services" breadcrumb link. Defaults to `"Services"`. */
+	servicesLabel?: string;
+}
+
+const { service, title, description, servicesLabel = 'Services', ...seoProps } = Astro.props;
+---
+
+<BusinessLayout title={title ?? service.title} description={description ?? service.description} {...seoProps}>
+	<slot name="header" slot="header" />
+	<slot name="footer" slot="footer" />
+	<ServiceSchema
+		name={service.title}
+		description={service.description}
+		url={`/services/${service.slug}`}
+		image={service.image}
+	/>
+	<Breadcrumbs
+		items={[{ label: 'Home', href: '/' }, { label: servicesLabel, href: '/services' }, { label: service.title }]}
+	/>
+	<slot />
+</BusinessLayout>

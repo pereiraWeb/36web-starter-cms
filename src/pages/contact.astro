@@ -1,0 +1,16 @@
+---
+import BusinessLayout from '../layouts/BusinessLayout.astro';
+import HeroBackground from '../components/hero/HeroBackground.astro';
+import ContactSplit from '../components/contact/ContactSplit.astro';
+---
+
+<BusinessLayout title="Contact" description="Get in touch with us.">
+	<HeroBackground
+		align="center"
+		height="360px"
+		title="Contact"
+		description="Get in touch with us."
+		showbutton={false}
+	/>
+	<ContactSplit />
+</BusinessLayout>

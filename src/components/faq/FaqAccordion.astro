@@ -1,0 +1,44 @@
+---
+import { faqs, faqContent } from '../../config/faqContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import Container from '../ui/Container.astro';
+import Accordion from '../ui/Accordion.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = faqContent.accordion.eyebrow,
+	title = faqContent.accordion.title,
+	description = faqContent.accordion.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="faq-accordion" style={style}>
+	<Container>
+		<div class="faq-accordion__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<Accordion items={faqs} class="faq-accordion__list" />
+	</Container>
+</section>
+
+<style>
+	.faq-accordion__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-md);
+	}
+
+</style>

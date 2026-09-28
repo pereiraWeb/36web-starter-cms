@@ -1,0 +1,27 @@
+---
+import { business } from '../../config/business';
+
+/**
+ * Site-wide `Organization` JSON-LD, identifying the publisher behind every
+ * page. Rendered once, globally, by `BusinessLayout.astro` — safe and
+ * recommended for any business, local or not. For businesses with a real
+ * physical location customers visit, also add `LocalBusinessSchema.astro`
+ * (see `src/pages/index.astro` for an example).
+ */
+const sameAs = Object.values(business.social).filter((url): url is string => Boolean(url));
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'Organization',
+	name: business.name,
+	legalName: business.legalName,
+	url: business.siteUrl,
+	logo: business.logo ? new URL(business.logo, business.siteUrl).toString() : undefined,
+	description: business.description,
+	email: business.email,
+	telephone: business.phone,
+	...(sameAs.length > 0 ? { sameAs } : {}),
+};
+---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />

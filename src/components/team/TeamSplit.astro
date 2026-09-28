@@ -1,0 +1,71 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardProfile from '../cards/CardProfile.astro';
+import { team, teamContent } from '../../config/teamContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = teamContent.split.eyebrow,
+	title = teamContent.split.title,
+	description = teamContent.split.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="team-split" style={style}>
+	<Container class="team-split__inner">
+		<div class="team-split__content">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="team-split__list">
+			{team.map((member) => (
+				<li>
+					<CardProfile name={member.name} role={member.role} bio={member.bio} image={member.image} />
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.team-split {
+		background-color: var(--color-surface);
+	}
+
+	:global(.team-split__inner) {
+		display: grid;
+		grid-template-columns: 0.8fr 1.2fr;
+		gap: var(--spacing-xl);
+		align-items: start;
+	}
+
+
+	.team-split__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	@media (max-width: 768px) {
+		:global(.team-split__inner) {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

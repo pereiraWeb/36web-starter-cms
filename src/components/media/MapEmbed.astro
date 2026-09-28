@@ -1,0 +1,39 @@
+---
+import ConsentGate from '../ui/ConsentGate.astro';
+import { business } from '../../config/business';
+import { integrations } from '../../config/integrations';
+
+/**
+ * Google Maps location embedded behind a `ConsentGate` — it never loads (or
+ * sets Google's cookies) until marketing consent is granted.
+ *
+ * Uses the official Google Maps Embed API (`.../maps/embed/v1/place`) when
+ * `PUBLIC_GOOGLE_MAPS_API_KEY` is set in `integrations.ts` — this gives a
+ * stable, officially supported embed and, unlike the keyless URL, needs an
+ * API key with the "Maps Embed API" enabled in Google Cloud Console (see
+ * `.env.example`). Without a key, falls back to the free, keyless
+ * `google.com/maps` embed so the component still works out of the box.
+ */
+export interface Props {
+	/** Full postal address to search for. Defaults to the address configured in `business.ts`. */
+	address?: string;
+	title?: string;
+	class?: string;
+}
+
+const {
+	address = `${business.address.street}, ${business.address.city}, ${business.address.country}`,
+	title = `Mapa de la ubicación de ${business.name}`,
+	class: className,
+} = Astro.props;
+
+const { googleMapsApiKey } = integrations.maps;
+
+const src = googleMapsApiKey
+	? `https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(googleMapsApiKey)}&q=${encodeURIComponent(address)}`
+	: `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
+---
+
+<ConsentGate category="marketing" aspectRatio="16 / 9" class={className}>
+	<iframe src={src} title={title} loading="lazy" style="width: 100%; height: 100%; aspect-ratio: 16 / 9; border: 0;"></iframe>
+</ConsentGate>

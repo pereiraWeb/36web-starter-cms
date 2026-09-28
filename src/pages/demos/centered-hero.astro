@@ -1,0 +1,14 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroCentered from '../../components/hero/HeroCentered.astro';
+import { ServicesGrid } from '../../components/services';
+import { TestimonialsMinimal } from '../../components/testimonials';
+---
+
+<BusinessLayout title="Demo: Centered Hero" description="Demo page combining a centered hero, a services grid and minimal testimonials." noindex>
+	<DemoIntro title="Centered Hero + Services Grid" components={['HeroCentered', 'ServicesGrid', 'TestimonialsMinimal']} />
+	<HeroCentered eyebrow="New" secondaryCtaText="Learn more" height="480px" />
+	<ServicesGrid backgroundColor="#f4f6ff" />
+	<TestimonialsMinimal />
+</BusinessLayout>

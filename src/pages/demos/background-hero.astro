@@ -1,0 +1,14 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroBackground from '../../components/hero/HeroBackground.astro';
+import { ServicesShowcase } from '../../components/services';
+import { TestimonialsGrid } from '../../components/testimonials';
+---
+
+<BusinessLayout title="Demo: Background Hero" description="Demo page combining a full-bleed background hero with a services showcase and testimonials grid." noindex>
+	<DemoIntro title="Background Hero + Services Showcase" components={['HeroBackground', 'ServicesShowcase', 'TestimonialsGrid']} />
+	<HeroBackground align="center" height="560px" />
+	<ServicesShowcase />
+	<TestimonialsGrid backgroundColor="#f4f6ff" />
+</BusinessLayout>

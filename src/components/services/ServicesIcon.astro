@@ -1,0 +1,69 @@
+---
+import Container from '../ui/Container.astro';
+import CardIcon from '../cards/CardIcon.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { services, servicesContent, getServiceHref } from '../../config/servicesContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = servicesContent.icon.eyebrow,
+	title = servicesContent.icon.title,
+	description = servicesContent.icon.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="services-icon" style={style}>
+	<Container>
+		<div class="services-icon__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="services-icon__list">
+			{services.map((service) => (
+				<li>
+					<CardIcon
+						title={service.title}
+						description={service.description}
+						icon={service.icon}
+						href={getServiceHref(service)}
+					/>
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.services-icon {
+		background-color: var(--color-surface);
+	}
+
+	.services-icon__header {
+		max-width: 640px;
+		margin: 0 auto var(--spacing-lg);
+		text-align: center;
+	}
+
+
+	.services-icon__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>

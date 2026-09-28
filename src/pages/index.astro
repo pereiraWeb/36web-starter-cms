@@ -1,0 +1,30 @@
+---
+import BusinessLayout from '../layouts/BusinessLayout.astro';
+import HeroBackground from '../components/hero/HeroBackground.astro';
+import { TextImage } from '../components/media';
+import { ServicesGrid } from '../components/services';
+import { TestimonialsGrid } from '../components/testimonials';
+import { CtaCentered } from '../components/cta';
+import LocalBusinessSchema from '../components/seo/LocalBusinessSchema.astro';
+import { business } from '../config/business';
+---
+
+<BusinessLayout title="Home" description="Welcome to our business website.">
+	<!--
+		Only meaningful for businesses with a real physical location customers
+		visit — if this is a purely online business/service, delete this line
+		(the site-wide `OrganizationSchema` in `BusinessLayout.astro` already
+		covers general SEO identity for every business type). See
+		`src/components/seo/LocalBusinessSchema.astro` for the `type` prop to
+		use a more specific schema.org subtype (e.g. "Restaurant", "Dentist").
+	-->
+	<LocalBusinessSchema />
+	<HeroBackground align="center"
+	height="360px"
+	title={business.name}
+	description={business.description} />
+	<TextImage  />
+	<ServicesGrid />
+	<TestimonialsGrid />
+	<CtaCentered />
+</BusinessLayout>

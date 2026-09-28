@@ -1,0 +1,40 @@
+/**
+ * Single source of truth for the site's design tokens — colors, fonts,
+ * border radius, spacing and max content width. Every component reads
+ * these CSS custom properties instead of hardcoding values, so changing a
+ * value here updates the whole site at once. There is intentionally no
+ * parallel `theme.ts`/JS config for this — see README section 13.1.
+ */
+:root {
+  --color-primary: #0d9488;
+  --color-secondary: #4b5563;
+  --color-background: #ffffff;
+  --color-surface: #f9fafb;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-bg-overlay: rgba(0, 0, 0, 0.463);
+
+  /*
+   * System fonts on purpose — `system-ui` resolves to whatever font each OS
+   * already ships (San Francisco on macOS/iOS, Segoe UI on Windows, Roboto
+   * on Android...). Zero bytes downloaded, zero font-related layout shift,
+   * zero render-blocking requests, and it still looks native everywhere.
+   * This is almost always the right performance/simplicity trade-off for a
+   * business site. If you need a specific brand font instead, see the
+   * self-hosting guide in `src/styles/global.css` (search for "@font-face")
+   * before reaching for Google Fonts or another font-hosting <link> — those
+   * add an extra render-blocking network request per visit.
+   */
+  --font-base: system-ui, sans-serif;
+  --font-heading: system-ui, sans-serif;
+
+  --radius-base: 8px;
+  --max-width: 1200px;
+
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2.5rem;
+  --spacing-xl: 4rem;
+}

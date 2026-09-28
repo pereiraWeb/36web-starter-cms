@@ -1,0 +1,348 @@
+---
+import type { NavItem } from '../../config/navigation';
+import Icon from '../ui/Icon.astro';
+
+export interface Props {
+	items: NavItem[];
+	align?: 'start' | 'center' | 'end';
+}
+
+const { items, align = 'start' } = Astro.props;
+
+/** Random suffix keeps the id unique if multiple NavMenu instances render on the same page. */
+const panelId = `nav-menu-panel-${Math.random().toString(36).slice(2, 9)}`;
+
+const currentPath = Astro.url.pathname;
+
+/** Marks a link `aria-current="page"` when it matches the current page, or is an ancestor section of it. */
+function isActive(href: string): boolean {
+	if (href === '/') return currentPath === '/';
+	return currentPath === href || currentPath.startsWith(`${href}/`);
+}
+---
+
+<div class="nav-menu-root">
+	<button
+		type="button"
+		class="nav-menu__toggle"
+		aria-expanded="false"
+		aria-controls={panelId}
+		aria-label="Abrir menú de navegación"
+		data-nav-menu-toggle
+		data-label-open="Abrir menú de navegación"
+		data-label-close="Cerrar menú de navegación"
+	>
+		<Icon name="menu" class="nav-menu__toggle-icon nav-menu__toggle-icon--open" />
+		<Icon name="close" class="nav-menu__toggle-icon nav-menu__toggle-icon--close" />
+	</button>
+	<ul id={panelId} class:list={['nav-menu', `nav-menu--${align}`]}>
+		{
+			items.map((item, index) => {
+				const hasChildren = Boolean(item.children && item.children.length > 0);
+				const submenuId = `${panelId}-submenu-${index}`;
+				return (
+					<li class:list={['nav-menu__item', { 'nav-menu__item--has-children': hasChildren }]}>
+						<div class="nav-menu__item-row">
+							<a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+								{item.label}
+							</a>
+							{hasChildren && (
+								<button
+									type="button"
+									class="nav-menu__submenu-toggle"
+									aria-expanded="false"
+									aria-controls={submenuId}
+									aria-label={`Mostrar submenú de ${item.label}`}
+									data-nav-submenu-toggle
+								>
+									<Icon name="chevron-down" size={16} class="nav-menu__submenu-icon" />
+								</button>
+							)}
+						</div>
+						{hasChildren && (
+							<ul id={submenuId} class="nav-menu__dropdown">
+								{item.children!.map((child) => (
+									<li>
+										<a href={child.href} aria-current={isActive(child.href) ? 'page' : undefined}>
+											{child.label}
+										</a>
+									</li>
+								))}
+							</ul>
+						)}
+					</li>
+				);
+			})
+		}
+	</ul>
+</div>
+
+<script>
+	function initNavMenus() {
+		document.querySelectorAll<HTMLElement>('.nav-menu-root').forEach((root) => {
+			if (root.dataset.navMenuInit) return;
+			root.dataset.navMenuInit = 'true';
+
+			const toggle = root.querySelector<HTMLButtonElement>('[data-nav-menu-toggle]');
+			const panel = root.querySelector<HTMLElement>('.nav-menu');
+			const labelOpen = toggle?.dataset.labelOpen ?? 'Abrir menú de navegación';
+			const labelClose = toggle?.dataset.labelClose ?? 'Cerrar menú de navegación';
+
+			const isOpen = () => root.classList.contains('nav-menu-root--open');
+
+			const closeMenu = () => {
+				if (!isOpen()) return;
+				root.classList.remove('nav-menu-root--open');
+				toggle?.setAttribute('aria-expanded', 'false');
+				toggle?.setAttribute('aria-label', labelOpen);
+			};
+
+			const openMenu = () => {
+				root.classList.add('nav-menu-root--open');
+				toggle?.setAttribute('aria-expanded', 'true');
+				toggle?.setAttribute('aria-label', labelClose);
+			};
+
+			toggle?.addEventListener('click', () => (isOpen() ? closeMenu() : openMenu()));
+
+			// Close as soon as a real nav link is activated — it's about to navigate away anyway.
+			panel?.querySelectorAll('a').forEach((link) => {
+				link.addEventListener('click', () => closeMenu());
+			});
+
+			// Close on Escape, returning focus to the toggle so keyboard users don't lose their place.
+			root.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && isOpen()) {
+					closeMenu();
+					toggle?.focus();
+				}
+			});
+
+			// Close when clicking anywhere outside the menu.
+			document.addEventListener('click', (event) => {
+				if (!isOpen() || !(event.target instanceof Node)) return;
+				if (!root.contains(event.target)) closeMenu();
+			});
+
+			// Per-item submenu toggle — an explicit button, not a `:hover` dependency,
+			// so it works identically on touch, mouse and keyboard.
+			root.querySelectorAll<HTMLButtonElement>('[data-nav-submenu-toggle]').forEach((submenuToggle) => {
+				submenuToggle.addEventListener('click', () => {
+					const item = submenuToggle.closest<HTMLElement>('.nav-menu__item');
+					const expanded = submenuToggle.getAttribute('aria-expanded') === 'true';
+					submenuToggle.setAttribute('aria-expanded', String(!expanded));
+					item?.classList.toggle('nav-menu__item--expanded', !expanded);
+				});
+			});
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', initNavMenus);
+	document.addEventListener('astro:page-load', initNavMenus);
+</script>
+
+<style>
+	.nav-menu-root {
+		display: flex;
+		align-items: center;
+	}
+
+	.nav-menu__toggle {
+		display: none;
+		align-items: center;
+		justify-content: center;
+		padding: 0.35rem;
+		border: none;
+		background: transparent;
+		color: inherit;
+		cursor: pointer;
+	}
+
+	.nav-menu__toggle-icon--close {
+		display: none;
+	}
+
+	.nav-menu-root--open .nav-menu__toggle-icon--open {
+		display: none;
+	}
+
+	.nav-menu-root--open .nav-menu__toggle-icon--close {
+		display: block;
+	}
+
+	.nav-menu {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.nav-menu--center {
+		justify-content: center;
+	}
+
+	.nav-menu--end {
+		justify-content: flex-end;
+	}
+
+	.nav-menu__item {
+		position: relative;
+	}
+
+	.nav-menu__item-row {
+		display: flex;
+		align-items: center;
+	}
+
+	.nav-menu__item-row > a[aria-current='page'] {
+		font-weight: 700;
+	}
+
+	.nav-menu__item--has-children > .nav-menu__item-row > a::after {
+		content: '';
+		display: inline-block;
+		width: 0.4em;
+		height: 0.4em;
+		margin-left: 0.4em;
+		border-right: 1.5px solid currentColor;
+		border-bottom: 1.5px solid currentColor;
+		transform: translateY(-2px) rotate(45deg);
+	}
+
+	/* Desktop-only expand button: the dropdown already opens on hover/focus-within
+	   there, so this button is hidden to avoid a redundant, tiny extra hit target. */
+	.nav-menu__submenu-toggle {
+		display: none;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		padding: 0.35rem;
+		border: none;
+		background: transparent;
+		color: inherit;
+		cursor: pointer;
+	}
+
+	.nav-menu__submenu-icon {
+		transition: transform 0.2s ease;
+	}
+
+	.nav-menu__dropdown {
+		position: absolute;
+		/* No top margin/gap here on purpose: a gap would create a dead zone the
+		   pointer has to cross (hovering nothing) between the trigger link and
+		   the dropdown, which breaks the :hover chain and closes the menu
+		   before the user can reach a sub item. The visual spacing is instead
+		   added via padding-top, which stays part of the hoverable box. */
+		top: 100%;
+		left: 0;
+		z-index: 30;
+		display: none;
+		flex-direction: column;
+		min-width: 210px;
+		margin: 0;
+		padding: 0.6rem 0.4rem 0.4rem;
+		list-style: none;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-base);
+		background-color: var(--color-background);
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+	}
+
+	.nav-menu__item--has-children:hover .nav-menu__dropdown,
+	.nav-menu__item--has-children:focus-within .nav-menu__dropdown {
+		display: flex;
+	}
+
+	.nav-menu__dropdown li a {
+		display: block;
+		padding: 0.5rem 0.65rem;
+		border-radius: var(--radius-base);
+		color: var(--color-text);
+		white-space: nowrap;
+	}
+
+	.nav-menu__dropdown li a:hover {
+		background-color: var(--color-surface);
+	}
+
+	/* Mobile: hamburger toggle + full-width slide-down panel. Requires the
+	   nearest positioned ancestor to be the <header> itself (see each Header
+	   component's `position: relative`), so the panel can span the full
+	   header width instead of just this component's own narrow box. */
+	@media (max-width: 860px) {
+		.nav-menu__toggle {
+			display: inline-flex;
+		}
+
+		.nav-menu {
+			display: none;
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			flex-direction: column;
+			align-items: stretch;
+			gap: 0;
+			padding: var(--spacing-sm);
+			border: 1px solid var(--color-border);
+			border-top: none;
+			background-color: var(--color-background);
+			box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+			z-index: 40;
+		}
+
+		.nav-menu-root--open .nav-menu {
+			display: flex;
+		}
+
+		.nav-menu__item {
+			width: 100%;
+		}
+
+		.nav-menu__item-row {
+			border-bottom: 1px solid var(--color-border);
+		}
+
+		.nav-menu__item-row > a {
+			flex: 1;
+			display: block;
+			padding: 0.65rem 0;
+		}
+
+		.nav-menu__item--has-children > .nav-menu__item-row > a::after {
+			display: none;
+		}
+
+		/* Explicit, tappable expand button — independent of `:hover`, which doesn't
+		   exist on touch devices — toggles the submenu below via `aria-expanded`. */
+		.nav-menu__submenu-toggle {
+			display: inline-flex;
+		}
+
+		.nav-menu__item--expanded .nav-menu__submenu-icon {
+			transform: rotate(180deg);
+		}
+
+		.nav-menu__dropdown {
+			position: static;
+			display: none;
+			width: 100%;
+			margin: 0;
+			padding: 0 0 0.5rem var(--spacing-md);
+			border: none;
+			box-shadow: none;
+		}
+
+		.nav-menu__item--expanded .nav-menu__dropdown {
+			display: flex;
+		}
+
+		.nav-menu__dropdown li a {
+			padding: 0.5rem 0;
+			border-bottom: none;
+		}
+	}
+</style>

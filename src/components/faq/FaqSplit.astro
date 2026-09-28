@@ -1,0 +1,62 @@
+---
+import { faqs, faqContent } from '../../config/faqContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import Container from '../ui/Container.astro';
+import Accordion from '../ui/Accordion.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+}
+
+const {
+	eyebrow = faqContent.split.eyebrow,
+	title = faqContent.split.title,
+	description = faqContent.split.description,
+	ctaText = faqContent.split.ctaText,
+	ctaHref = faqContent.split.ctaHref,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="faq-split" style={style}>
+	<Container class="faq-split__inner">
+		<div class="faq-split__content">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+			<Button href={ctaHref}>{ctaText}</Button>
+		</div>
+		<Accordion items={faqs} class="faq-split__list" />
+	</Container>
+</section>
+
+<style>
+	:global(.faq-split__inner) {
+		display: grid;
+		grid-template-columns: 0.8fr 1.2fr;
+		gap: var(--spacing-xl);
+		align-items: start;
+	}
+
+
+	.faq-split__content :global(.btn) {
+		margin-top: var(--spacing-xs);
+	}
+
+	@media (max-width: 768px) {
+		:global(.faq-split__inner) {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -1,0 +1,100 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import ResponsiveImage from '../media/ResponsiveImage.astro';
+import { testimonials, testimonialsContent } from '../../config/testimonialsContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import { imageFallbacks } from '../../config/images';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+}
+
+const {
+	eyebrow = testimonialsContent.centered.eyebrow,
+	title = testimonialsContent.centered.title,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+const featured = testimonials.find((testimonial) => testimonial.featured) ?? testimonials[0];
+---
+
+<section class="testimonials-centered" style={style}>
+	<Container class="testimonials-centered__inner">
+		<SectionHeading eyebrow={eyebrow} title={title} />
+		{featured && (
+			<>
+				{featured.rating && (
+					<div class="testimonials-centered__rating" aria-label={`${featured.rating} out of 5 stars`}>
+						{Array.from({ length: 5 }).map((_, index) => (
+							<span aria-hidden="true">{index < featured.rating! ? '★' : '☆'}</span>
+						))}
+					</div>
+				)}
+				<p class="testimonials-centered__quote">&ldquo;{featured.quote}&rdquo;</p>
+				<div class="testimonials-centered__author">
+					<ResponsiveImage src={featured.avatar || imageFallbacks.photo} alt={featured.author} width={48} height={48} />
+					<div>
+						<p class="testimonials-centered__name">{featured.author}</p>
+						{featured.role && <p class="testimonials-centered__role">{featured.role}</p>}
+					</div>
+				</div>
+			</>
+		)}
+	</Container>
+</section>
+
+<style>
+	.testimonials-centered {
+		background-color: var(--color-surface);
+		text-align: center;
+	}
+
+	:global(.testimonials-centered__inner) {
+		max-width: 700px;
+	}
+
+	.testimonials-centered__rating {
+		margin-top: var(--spacing-sm);
+		color: var(--color-primary);
+		letter-spacing: 0.1em;
+	}
+
+	.testimonials-centered__quote {
+		font-size: clamp(1.35rem, 3vw, 1.85rem);
+		font-weight: 500;
+		line-height: 1.4;
+	}
+
+	.testimonials-centered__author {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--spacing-sm);
+		margin-top: var(--spacing-md);
+	}
+
+	/* :global() because the `<img>` is now rendered by the `ResponsiveImage` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.testimonials-centered__author img) {
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+
+	.testimonials-centered__name {
+		margin: 0;
+		font-weight: bold;
+		text-align: left;
+	}
+
+	.testimonials-centered__role {
+		margin: 0;
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+		text-align: left;
+	}
+</style>

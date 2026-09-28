@@ -1,0 +1,82 @@
+---
+import { consentCheckboxContent } from '../../config/formContent';
+
+/** Required "I agree to the privacy policy" checkbox used by `ContactForm`. */
+export interface Props {
+	label?: string;
+	policyText?: string;
+	policyHref?: string;
+	errorText?: string;
+	required?: boolean;
+	class?: string;
+}
+
+const {
+	label = consentCheckboxContent.label,
+	policyText = consentCheckboxContent.policyText,
+	policyHref = consentCheckboxContent.policyHref,
+	errorText = consentCheckboxContent.errorText,
+	required = true,
+	class: className,
+} = Astro.props;
+
+const id = `consent-${Math.random().toString(36).slice(2, 8)}`;
+const errorId = `${id}-error`;
+---
+
+<div class:list={['consent-checkbox', className]} data-consent-checkbox>
+	<div class="consent-checkbox__row">
+		{/* Left unchecked by default — never pre-checked. `ContactForm`'s script reads
+		 `.checked` directly and sends it as a boolean in the JSON payload, so no
+		 hidden fallback field is needed to distinguish "unchecked" from "not rendered". */}
+		<input type="checkbox" id={id} name="consent" required={required} aria-describedby={errorId} />
+		<label for={id}>
+			{label}{' '}
+			<a href={policyHref} target="_blank" rel="noopener noreferrer">
+				{policyText}
+			</a>
+		</label>
+	</div>
+	<p class="consent-checkbox__error" id={errorId} data-consent-error hidden>{errorText}</p>
+</div>
+
+<style>
+	.consent-checkbox {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+
+	.consent-checkbox__row {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.5rem;
+		font-size: 0.85rem;
+		color: var(--color-text-muted);
+	}
+
+	.consent-checkbox input {
+		flex-shrink: 0;
+		margin-top: 0.2rem;
+		accent-color: var(--color-primary);
+	}
+
+	.consent-checkbox label {
+		cursor: pointer;
+	}
+
+	.consent-checkbox a {
+		color: var(--color-primary);
+		font-weight: 600;
+	}
+
+	.consent-checkbox__error {
+		margin: 0;
+		color: #dc2626;
+		font-size: 0.8rem;
+	}
+
+	.consent-checkbox__error[hidden] {
+		display: none;
+	}
+</style>

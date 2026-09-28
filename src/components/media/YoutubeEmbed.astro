@@ -1,0 +1,24 @@
+---
+import ConsentGate from '../ui/ConsentGate.astro';
+
+/** YouTube video embedded behind a `ConsentGate` — it never loads (or sets YouTube's cookies) until marketing consent is granted. */
+export interface Props {
+	/** The video ID (the part after `v=` or `youtu.be/`), e.g. `"dQw4w9WgXcQ"`. */
+	videoId: string;
+	title: string;
+	class?: string;
+}
+
+const { videoId, title, class: className } = Astro.props;
+---
+
+<ConsentGate category="marketing" aspectRatio="16 / 9" class={className}>
+	<iframe
+		src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+		title={title}
+		loading="lazy"
+		allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+		allowfullscreen
+		style="width: 100%; height: 100%; aspect-ratio: 16 / 9; border: 0;"
+	></iframe>
+</ConsentGate>

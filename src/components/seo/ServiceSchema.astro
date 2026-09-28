@@ -1,0 +1,29 @@
+---
+import { business } from '../../config/business';
+
+export interface Props {
+	name: string;
+	description: string;
+	/** Root-relative or absolute URL of this service's own page. */
+	url: string;
+	image?: string;
+}
+
+const { name, description, url, image } = Astro.props;
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'Service',
+	name,
+	description,
+	url: new URL(url, business.siteUrl).toString(),
+	image: image ? new URL(image, business.siteUrl).toString() : undefined,
+	provider: {
+		'@type': 'Organization',
+		name: business.name,
+		url: business.siteUrl,
+	},
+};
+---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />

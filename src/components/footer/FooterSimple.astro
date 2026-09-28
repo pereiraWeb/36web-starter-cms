@@ -1,0 +1,90 @@
+---
+import Container from '../ui/Container.astro';
+import AgencyCredit from '../ui/AgencyCredit.astro';
+import BrandMark from '../ui/BrandMark.astro';
+import { business } from '../../config/business';
+import { legalNavigation } from '../../config/navigation';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	logo?: string;
+	logoAlt?: string;
+}
+
+const { logo = business.logo, logoAlt = business.name, backgroundColor, backgroundImage } = Astro.props;
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+const year = new Date().getFullYear();
+---
+
+<footer class="footer-simple" style={style}>
+	<Container class="footer-simple__inner">
+		<div class="footer-simple__brand-group">
+			<a href="/" class="footer-simple__brand">
+				<BrandMark logo={logo} logoAlt={logoAlt} class="footer-simple__logo" />
+			</a>
+			<p class="footer-simple__copyright">&copy; {year} {business.legalName}. All rights reserved.</p>
+		</div>
+		<nav aria-label="Navegación legal">
+			<ul>
+				{legalNavigation.map((item) => (
+					<li><a href={item.href}>{item.label}</a></li>
+				))}
+			</ul>
+		</nav>
+	</Container>
+	<Container class="footer-simple__credit-row">
+		<AgencyCredit />
+	</Container>
+</footer>
+
+<style>
+	.footer-simple {
+		border-top: 1px solid var(--color-border);
+		background-color: var(--color-surface);
+	}
+
+	:global(.footer-simple__inner) {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--spacing-sm);
+		padding-block: var(--spacing-md);
+	}
+
+	:global(.footer-simple__inner) ul {
+		display: flex;
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.footer-simple__brand-group {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--spacing-sm);
+	}
+
+	.footer-simple__brand {
+		display: inline-flex;
+		font-weight: bold;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `BrandMark` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.footer-simple__logo) {
+		height: 1.75rem;
+		width: auto;
+	}
+
+	.footer-simple__copyright {
+		margin: 0;
+	}
+
+	:global(.footer-simple__credit-row) {
+		padding-block: var(--spacing-xs);
+		border-top: 1px solid var(--color-border);
+		text-align: center;
+	}
+</style>

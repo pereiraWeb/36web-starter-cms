@@ -1,0 +1,124 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { business } from '../../config/business';
+import { heroContent } from '../../config/heroContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	primaryCtaText?: string;
+	primaryCtaHref?: string;
+	secondaryCtaText?: string;
+	secondaryCtaHref?: string;
+	/** Any valid CSS length (e.g. "auto", "480px", "70vh"). */
+	height?: string;
+	/** Set to false to hide the primary CTA button (e.g. when only the secondary link is needed). */
+	showbutton?: boolean;
+}
+
+const {
+	eyebrow,
+	title = business.name,
+	description = business.tagline,
+	primaryCtaText = heroContent.centered.primaryCtaText,
+	primaryCtaHref = heroContent.centered.primaryCtaHref,
+	secondaryCtaText,
+	secondaryCtaHref = heroContent.centered.secondaryCtaHref,
+	height = heroContent.centered.height,
+	backgroundColor,
+	backgroundImage,
+	showbutton = true,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--hero-height': height });
+---
+
+<section class="hero-centered" style={style}>
+	<div class="hero-centered__glow" aria-hidden="true"></div>
+	<Container class="hero-centered__inner">
+		<SectionHeading
+			as="h1"
+			eyebrow={eyebrow}
+			eyebrowClass="hero-centered__eyebrow"
+			title={title}
+			titleClass="hero-centered__title"
+			description={description}
+			descriptionClass="hero-centered__description"
+		/>
+		<div class="hero-centered__actions">
+			{showbutton && <Button href={primaryCtaHref}>{primaryCtaText}</Button>}
+			{secondaryCtaText && <Button href={secondaryCtaHref} variant="outline">{secondaryCtaText}</Button>}
+		</div>
+	</Container>
+</section>
+
+<style>
+	.hero-centered {
+		position: relative;
+		width: 100%;
+		overflow: hidden;
+		min-height: var(--hero-height, auto);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--color-surface);
+		text-align: center;
+		padding-block: var(--spacing-xl);
+	}
+
+	.hero-centered__glow {
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(45% 55% at 20% 20%, color-mix(in srgb, var(--color-primary) 18%, transparent), transparent 70%),
+			radial-gradient(45% 55% at 80% 30%, color-mix(in srgb, var(--color-secondary) 16%, transparent), transparent 70%);
+		pointer-events: none;
+	}
+
+	:global(.hero-centered__inner) {
+		position: relative;
+		max-width: 720px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	/* :global() below because these are now rendered by the `SectionHeading` child component, outside this component's scoped-CSS boundary. */
+	:global(.hero-centered__eyebrow) {
+		display: inline-block;
+		margin-bottom: var(--spacing-sm);
+		padding: 0.35rem 0.9rem;
+		border-radius: 999px;
+		border: 1px solid var(--color-border);
+		background-color: var(--color-background);
+		color: var(--color-secondary);
+		font-size: 0.8rem;
+		font-weight: 600;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+	}
+
+	:global(.hero-centered__title) {
+		margin: 0 0 var(--spacing-sm);
+		font-size: clamp(2.25rem, 5vw, 3.5rem);
+		line-height: 1.1;
+	}
+
+	:global(.hero-centered__description) {
+		max-width: 560px;
+		color: var(--color-text-muted);
+		font-size: 1.15rem;
+	}
+
+	.hero-centered__actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--spacing-sm);
+		margin-top: var(--spacing-sm);
+	}
+</style>

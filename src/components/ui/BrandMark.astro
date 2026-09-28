@@ -1,0 +1,51 @@
+---
+import { business } from '../../config/business';
+import { imageFallbacks } from '../../config/images';
+
+/**
+ * The "logo image, or business name as text" brand mark repeated in every
+ * header and footer variant. Renders just the `<img>`/`<span>` — callers
+ * keep their own `<a href="/">` wrapper (and its own class/styles) around
+ * it, so each variant's link styling and layout stay untouched.
+ */
+export interface Props {
+	logo?: string;
+	logoAlt?: string;
+	/** Applied to the `<img>`, or to the fallback `<span>` when `fallbackToText` is true. */
+	class?: string;
+	/** When there's no logo, render the business name as text instead of nothing. Defaults to `true` — set to `false` when the caller already shows the name elsewhere (e.g. next to a copyright notice). */
+	fallbackToText?: boolean;
+	/** `"dark"` picks `business.logoDark` (falling back to `logo`/`business.logo` when unset) — use on a header/footer with a dark background. */
+	variant?: 'light' | 'dark';
+	width?: number;
+	height?: number;
+}
+
+const { variant = 'light' } = Astro.props;
+
+const {
+	logo = (variant === 'dark' ? business.logoDark : undefined) ?? business.logo,
+	logoAlt = business.name,
+	class: className,
+	fallbackToText = true,
+	width = business.logoWidth ?? 160,
+	height = business.logoHeight ?? 40,
+} = Astro.props;
+---
+
+{
+	logo ? (
+		<img
+			class={className}
+			src={logo}
+			alt={logoAlt}
+			width={width}
+			height={height}
+			loading="eager"
+			decoding="async"
+			data-fallback-src={imageFallbacks.logo !== logo ? imageFallbacks.logo : undefined}
+		/>
+	) : (
+		fallbackToText && <span class={className}>{business.name}</span>
+	)
+}

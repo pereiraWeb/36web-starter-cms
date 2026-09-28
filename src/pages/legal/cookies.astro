@@ -1,0 +1,47 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { business } from '../../config/business';
+import { cookieConsentContent } from '../../config/cookieConsentContent';
+---
+
+<LegalLayout
+	title="Política de cookies"
+	description="Información sobre las cookies utilizadas en esta web."
+	breadcrumbLabel="Política de cookies"
+>
+	<h2>¿Qué son las cookies?</h2>
+	<p>
+		Las cookies son pequeños archivos que se almacenan en tu navegador al visitar una web. Se usan para recordar
+		tus preferencias, entender cómo se usa el sitio y, en algunos casos, mostrar contenido de servicios externos.
+	</p>
+
+	<h2>Categorías de cookies que utilizamos</h2>
+	<p>
+		Puedes aceptar o rechazar cada categoría (salvo las necesarias) desde el aviso de cookies o, en cualquier
+		momento, desde el enlace "Gestionar cookies" del pie de página.
+	</p>
+	<ul>
+		{cookieConsentContent.categories.map((category) => (
+			<li>
+				<strong>{category.title}{category.required ? ' (siempre activas)' : ''}:</strong> {category.description}
+			</li>
+		))}
+	</ul>
+
+	<h2>Listado detallado de cookies</h2>
+	<p>
+		[SUSTITUIR POR EL LISTADO REAL DE COOKIES CONCRETAS QUE USA LA WEB UNA VEZ ACTIVADOS LOS SERVICIOS
+		CORRESPONDIENTES — POR EJEMPLO: `_ga`/`_ga_*` DE GOOGLE ANALYTICS SI SE CONFIGURA `PUBLIC_GA_MEASUREMENT_ID`;
+		COOKIES DE GOOGLE ADS SI SE CONFIGURA `PUBLIC_GOOGLE_ADS_ID`; COOKIES DE META PIXEL (`_fbp`) SI SE CONFIGURA
+		`PUBLIC_META_PIXEL_ID`; COOKIES DE GOOGLE MAPS/YOUTUBE SI SE USAN LOS COMPONENTES `MapEmbed`/`YoutubeEmbed` —
+		INDICANDO NOMBRE, FINALIDAD, DURACIÓN Y SI SON PROPIAS O DE TERCEROS.]
+	</p>
+
+	<h2>Cómo desactivar las cookies desde el navegador</h2>
+	<p>
+		Además de nuestro panel de preferencias, puedes bloquear o eliminar las cookies desde la configuración de tu
+		propio navegador. Ten en cuenta que hacerlo puede afectar al funcionamiento de esta y otras webs.
+	</p>
+
+	<p>Cualquier pregunta sobre esta política puede enviarse a {business.email}.</p>
+</LegalLayout>

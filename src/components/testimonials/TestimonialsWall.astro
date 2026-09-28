@@ -1,0 +1,77 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardTestimonial from '../cards/CardTestimonial.astro';
+import { testimonials, testimonialsContent } from '../../config/testimonialsContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = testimonialsContent.wall.eyebrow,
+	title = testimonialsContent.wall.title,
+	description = testimonialsContent.wall.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="testimonials-wall" style={style}>
+	<Container>
+		<div class="testimonials-wall__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="testimonials-wall__list">
+			{testimonials.map((testimonial, index) => (
+				<li class:list={['testimonials-wall__item', { 'testimonials-wall__item--offset': index % 2 === 1 }]}>
+					<CardTestimonial
+						quote={testimonial.quote}
+						author={testimonial.author}
+						role={testimonial.role}
+						avatar={testimonial.avatar}
+						rating={testimonial.rating}
+					/>
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.testimonials-wall__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+		text-align: center;
+		margin-inline: auto;
+	}
+
+
+	.testimonials-wall__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.testimonials-wall__item--offset {
+		transform: translateY(var(--spacing-lg));
+	}
+
+	@media (max-width: 768px) {
+		.testimonials-wall__item--offset {
+			transform: none;
+		}
+	}
+</style>

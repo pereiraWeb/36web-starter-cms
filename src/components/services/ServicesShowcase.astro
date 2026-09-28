@@ -1,0 +1,66 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardImage from '../cards/CardImage.astro';
+import { services, servicesContent, getServiceHref } from '../../config/servicesContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+}
+
+const {
+	eyebrow = servicesContent.showcase.eyebrow,
+	title = servicesContent.showcase.title,
+	description = servicesContent.showcase.description,
+	ctaText = servicesContent.showcase.ctaText,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="services-showcase" style={style}>
+	<Container>
+		<div class="services-showcase__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="services-showcase__list">
+			{services.map((service) => (
+				<li>
+					<CardImage
+						title={service.title}
+						description={service.description}
+						image={service.image}
+						ctaText={ctaText}
+						href={getServiceHref(service)}
+					/>
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.services-showcase__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+	}
+
+	.services-showcase__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>

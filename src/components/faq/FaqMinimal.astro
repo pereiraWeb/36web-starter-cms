@@ -1,0 +1,57 @@
+---
+import Container from '../ui/Container.astro';
+import { faqs, faqContent } from '../../config/faqContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = faqContent.minimal.title,
+	description = faqContent.minimal.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="faq-minimal" style={style}>
+	<Container>
+		<div class="faq-minimal__header">
+			<h2>{title}</h2>
+			{description && <p class="faq-minimal__description">{description}</p>}
+		</div>
+		<dl class="faq-minimal__list">
+			{faqs.map((faq) => (
+				<>
+					<dt>{faq.question}</dt>
+					<dd>{faq.answer}</dd>
+				</>
+			))}
+		</dl>
+	</Container>
+</section>
+
+<style>
+	.faq-minimal__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-md);
+	}
+
+	.faq-minimal__description {
+		color: var(--color-text-muted);
+	}
+
+	.faq-minimal__list dt {
+		font-weight: bold;
+		margin-top: var(--spacing-sm);
+	}
+
+	.faq-minimal__list dd {
+		margin: 0;
+		color: var(--color-text-muted);
+	}
+</style>

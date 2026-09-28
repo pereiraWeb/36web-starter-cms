@@ -1,0 +1,74 @@
+---
+import { HeaderSimple } from '../components/header';
+import { FooterColumns } from '../components/footer';
+import SkipLink from '../components/ui/SkipLink.astro';
+import WhatsappButton from '../components/ui/WhatsappButton.astro';
+import BackToTop from '../components/ui/BackToTop.astro';
+import CookieConsent from '../components/ui/CookieConsent.astro';
+import SeoHead from '../components/ui/SeoHead.astro';
+import OrganizationSchema from '../components/seo/OrganizationSchema.astro';
+import { business } from '../config/business';
+import type { SeoProps } from '../lib/seo';
+import '../styles/tokens.css';
+import '../styles/global.css';
+
+/**
+ * Base layout for every real page (SEO head, header, footer, cookie
+ * consent, WhatsApp/back-to-top buttons, analytics boot). Swap the header
+ * or footer variant per-page — without touching this file — via the
+ * `header`/`footer` named slots, e.g.:
+ *
+ * ```astro
+ * <BusinessLayout title="...">
+ *   <HeaderCta slot="header" />
+ *   <FooterCta slot="footer" />
+ *   ...page content...
+ * </BusinessLayout>
+ * ```
+ *
+ * Omit either slot to keep the defaults below (`HeaderSimple`/`FooterColumns`).
+ */
+export interface Props extends SeoProps {}
+
+const seoProps = Astro.props;
+---
+
+<html lang={business.language}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="generator" content={Astro.generator} />
+
+		<SeoHead {...seoProps} />
+		<OrganizationSchema />
+	</head>
+	<body>
+		<SkipLink />
+		<slot name="header"><HeaderSimple /></slot>
+		<main id="main-content">
+			<slot />
+		</main>
+		<slot name="footer"><FooterColumns /></slot>
+		<WhatsappButton />
+		<BackToTop />
+		<CookieConsent />
+
+		<script>
+			import { initAnalytics } from '../lib/analytics';
+			import { initImageFallbacks } from '../lib/imageFallback';
+
+			function boot() {
+				if (document.documentElement.dataset.analyticsInit) return;
+				document.documentElement.dataset.analyticsInit = 'true';
+				initAnalytics();
+				initImageFallbacks();
+			}
+
+			document.addEventListener('DOMContentLoaded', boot);
+			document.addEventListener('astro:page-load', boot);
+		</script>
+	</body>
+</html>

@@ -1,0 +1,55 @@
+---
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import Container from './Container.astro';
+
+/**
+ * Generic full-width section wrapper: configurable background (color/image),
+ * configurable height, and an optional built-in Container for its content.
+ * Use this for standalone/page-level sections. Component families (Hero,
+ * Services, Team...) keep their own root element so their scoped styles keep
+ * targeting it directly, but they rely on the same `backgroundStyle()` helper
+ * that powers this component.
+ */
+export interface Props extends BackgroundProps {
+	as?: 'section' | 'div' | 'header' | 'footer';
+	class?: string;
+	/** Any valid CSS length (e.g. "auto", "480px", "70vh"). */
+	height?: string;
+	/** Wrap the slot content in a `<Container>`. Defaults to true. */
+	contained?: boolean;
+	containerClass?: string;
+	narrowContainer?: boolean;
+}
+
+const {
+	as: Tag = 'section',
+	class: className,
+	height,
+	contained = true,
+	containerClass,
+	narrowContainer = false,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--section-height': height });
+---
+
+<Tag class:list={['ui-section', className]} style={style}>
+	{
+		contained ? (
+			<Container class={containerClass} narrow={narrowContainer}>
+				<slot />
+			</Container>
+		) : (
+			<slot />
+		)
+	}
+</Tag>
+
+<style>
+	.ui-section {
+		width: 100%;
+		min-height: var(--section-height, auto);
+	}
+</style>

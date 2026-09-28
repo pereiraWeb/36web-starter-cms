@@ -1,0 +1,132 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import ResponsiveImage from '../media/ResponsiveImage.astro';
+import { business } from '../../config/business';
+import { heroContent } from '../../config/heroContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import { imageFallbacks } from '../../config/images';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	primaryCtaText?: string;
+	primaryCtaHref?: string;
+	secondaryCtaText?: string;
+	secondaryCtaHref?: string;
+	image?: string;
+	imageAlt?: string;
+	/** Flips the columns so the visual sits on the left and the copy on the right. */
+	reverse?: boolean;
+	/** Any valid CSS length (e.g. "auto", "480px", "70vh"). */
+	height?: string;
+	/** This is a hero — its visual is almost always the page's LCP candidate, so it defaults to `true`. Set to `false` if this instance isn't used as the page's main hero (e.g. a second `HeroSplit` further down the page). */
+	priority?: boolean;
+}
+
+const {
+	eyebrow,
+	title = business.name,
+	description = business.description,
+	primaryCtaText = heroContent.split.primaryCtaText,
+	primaryCtaHref = heroContent.split.primaryCtaHref,
+	secondaryCtaText,
+	secondaryCtaHref = heroContent.split.secondaryCtaHref,
+	image = imageFallbacks.photo,
+	imageAlt = title,
+	reverse = false,
+	height = heroContent.split.height,
+	priority = true,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--hero-height': height });
+---
+
+<section class:list={['hero-split', { 'hero-split--reverse': reverse }]} style={style}>
+	<Container class="hero-split__inner">
+		<div class="hero-split__content">
+			<SectionHeading
+				as="h1"
+				eyebrow={eyebrow}
+				title={title}
+				titleClass="hero-split__title"
+				description={description}
+				descriptionClass="hero-split__description"
+			/>
+			<div class="hero-split__actions">
+				<Button href={primaryCtaHref}>{primaryCtaText}</Button>
+				{secondaryCtaText && <Button href={secondaryCtaHref} variant="outline">{secondaryCtaText}</Button>}
+			</div>
+		</div>
+		<div class="hero-split__visual">
+			<ResponsiveImage src={image} alt={imageAlt} width={800} height={600} priority={priority} />
+		</div>
+	</Container>
+</section>
+
+<style>
+	.hero-split {
+		width: 100%;
+		min-height: var(--hero-height, auto);
+		display: flex;
+		align-items: center;
+		background-color: var(--color-background);
+	}
+
+	:global(.hero-split__inner) {
+		width: 100%;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+		gap: var(--spacing-xl);
+	}
+
+	.hero-split--reverse .hero-split__content {
+		order: 2;
+	}
+
+	.hero-split--reverse .hero-split__visual {
+		order: 1;
+	}
+
+	/* :global() below because these are now rendered by the `SectionHeading` child component, outside this component's scoped-CSS boundary. */
+	:global(.hero-split__title) {
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.15;
+	}
+
+	:global(.hero-split__description) {
+		color: var(--color-text-muted);
+		font-size: 1.1rem;
+	}
+
+	.hero-split__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-sm);
+		margin-top: var(--spacing-sm);
+	}
+
+	/* :global() because the `<img>` is now rendered by the `ResponsiveImage` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.hero-split__visual img) {
+		width: 100%;
+		border-radius: var(--radius-base);
+		object-fit: cover;
+		aspect-ratio: 4 / 3;
+	}
+
+	@media (max-width: 768px) {
+		:global(.hero-split__inner) {
+			grid-template-columns: 1fr;
+		}
+
+		.hero-split--reverse .hero-split__content,
+		.hero-split--reverse .hero-split__visual {
+			order: initial;
+		}
+	}
+</style>

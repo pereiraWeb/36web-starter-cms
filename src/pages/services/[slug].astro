@@ -1,0 +1,127 @@
+---
+import ServiceLayout from '../../layouts/ServiceLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Button from '../../components/ui/Button.astro';
+import Icon from '../../components/ui/Icon.astro';
+import ResponsiveImage from '../../components/media/ResponsiveImage.astro';
+import { CtaBoxed } from '../../components/cta';
+import { services, servicesContent, type Service } from '../../config/servicesContent';
+import { imageFallbacks } from '../../config/images';
+
+export function getStaticPaths() {
+	return services.map((service) => ({
+		params: { slug: service.slug },
+		props: { service },
+	}));
+}
+
+interface Props {
+	service: Service;
+}
+
+const { service } = Astro.props;
+---
+<ServiceLayout service={service}>
+	<Section>
+		<div class="single-service">
+			<div class="single-service__media">
+				<ResponsiveImage src={service.image ?? imageFallbacks.photo} alt={service.title} width={800} height={600} priority />
+			</div>
+			<div class="single-service__content">
+				<h1 class="single-service__title">{service.title}</h1>
+				<p class="single-service__lead">{service.description}</p>
+				{service.content && <p class="single-service__body">{service.content}</p>}
+				{service.features && service.features.length > 0 && (
+					<ul class="single-service__features">
+						{service.features.map((feature) => (
+							<li>
+								<Icon name="check" size={18} />
+								{feature}
+							</li>
+						))}
+					</ul>
+				)}
+				<div class="single-service__actions">
+					<Button href={servicesContent.single.ctaHref}>{servicesContent.single.ctaText}</Button>
+					<Button href="/services" variant="outline">
+						<Icon name="chevron-right" size={16} class="single-service__back-icon" />
+						{servicesContent.single.backText}
+					</Button>
+				</div>
+			</div>
+		</div>
+	</Section>
+	<CtaBoxed />
+</ServiceLayout>
+
+
+<style>
+	.single-service {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--spacing-xl);
+		align-items: center;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `ResponsiveImage` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.single-service__media img) {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		border-radius: calc(var(--radius-base) * 1.5);
+		object-fit: cover;
+	}
+
+	.single-service__title {
+		font-size: clamp(2rem, 4vw, 2.75rem);
+		line-height: 1.2;
+	}
+
+	.single-service__lead {
+		font-size: 1.15rem;
+		color: var(--color-text-muted);
+	}
+
+	.single-service__body {
+		color: var(--color-text-muted);
+	}
+
+	.single-service__features {
+		display: grid;
+		gap: 0.6rem;
+		list-style: none;
+		margin: var(--spacing-md) 0;
+		padding: 0;
+	}
+
+	.single-service__features li {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+
+	.single-service__features :global(.icon) {
+		flex-shrink: 0;
+		color: var(--color-primary);
+	}
+
+	.single-service__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-sm);
+		margin-top: var(--spacing-md);
+	}
+
+	:global(.single-service__back-icon) {
+		transform: rotate(180deg);
+	}
+
+	@media (max-width: 768px) {
+		.single-service {
+			grid-template-columns: 1fr;
+		}
+
+		.single-service__media {
+			order: -1;
+		}
+	}
+</style>

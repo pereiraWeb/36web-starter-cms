@@ -1,0 +1,58 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { ContactForm } from '../forms';
+import { contactContent } from '../../config/contactContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	submitText?: string;
+}
+
+const {
+	eyebrow = contactContent.centered.eyebrow,
+	title = contactContent.centered.title,
+	description = contactContent.centered.description,
+	submitText = contactContent.centered.submitText,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="contact-centered" style={style}>
+	<Container class="contact-centered__inner">
+		<SectionHeading
+			eyebrow={eyebrow}
+			title={title}
+			description={description}
+		/>
+		<ContactForm class="contact-centered__form" submitText={submitText} />
+	</Container>
+</section>
+
+<style>
+	.contact-centered {
+		background-color: var(--color-surface);
+		text-align: center;
+	}
+
+	:global(.contact-centered__inner) {
+		max-width: 560px;
+	}
+
+
+	:global(.contact-centered__form) {
+		margin-top: var(--spacing-md);
+		text-align: left;
+	}
+
+	:global(.contact-centered__submit) {
+		align-self: center;
+		margin-top: var(--spacing-xs);
+	}
+</style>

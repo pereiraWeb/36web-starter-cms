@@ -1,0 +1,77 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardBasic from '../cards/CardBasic.astro';
+import { services, servicesContent, getServiceHref } from '../../config/servicesContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+}
+
+const {
+	eyebrow = servicesContent.split.eyebrow,
+	title = servicesContent.split.title,
+	description = servicesContent.split.description,
+	ctaText = servicesContent.split.ctaText,
+	ctaHref = servicesContent.split.ctaHref,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="services-split" style={style}>
+	<Container class="services-split__inner">
+		<div class="services-split__content">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+			<Button href={ctaHref} class="services-split__cta">{ctaText}</Button>
+		</div>
+		<ul class="services-split__list">
+			{services.map((service) => (
+				<li>
+					<CardBasic title={service.title} description={service.description} href={getServiceHref(service)} />
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	:global(.services-split__inner) {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--spacing-xl);
+		align-items: start;
+	}
+
+
+	:global(.services-split__cta) {
+		margin-top: var(--spacing-xs);
+	}
+
+	.services-split__list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-sm);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	@media (max-width: 768px) {
+		:global(.services-split__inner) {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

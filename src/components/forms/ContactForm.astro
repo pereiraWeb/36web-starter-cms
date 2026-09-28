@@ -1,0 +1,379 @@
+---
+import FormField from './FormField.astro';
+import ConsentCheckbox from './ConsentCheckbox.astro';
+import FormStatus from './FormStatus.astro';
+import Button from '../ui/Button.astro';
+import { contactFieldLabels } from '../../config/contactContent';
+import { contactFieldLimits } from '../../lib/forms';
+import { contactFormText } from '../../config/formContent';
+import { HONEYPOT_FIELD_NAME } from '../../lib/antispam';
+import { business } from '../../config/business';
+
+/**
+ * Shared, functional contact form used by every `Contact*` variant. Handles
+ * client-side validation (a UX helper only — the `/api/contact` endpoint is
+ * the source of truth), submission states, a success/error status message
+ * and spam protection, while each variant keeps its own visual style by
+ * overriding these classes in its own `<style>` block.
+ */
+export interface Props {
+	submitText?: string;
+	/** Button label while the request is in flight. */
+	submittingText?: string;
+	/**
+	 * Endpoint the form data is POSTed to as JSON (see `src/pages/api/contact.ts`,
+	 * which validates the payload server-side and sends it via `sendContactEmail`,
+	 * `src/lib/email.ts`, Resend). Not rendered as the `<form>`'s native `action` —
+	 * the endpoint only accepts `application/json`, so a plain HTML submit (no JS)
+	 * would not work against it; see the `<noscript>` message below instead. Pass
+	 * an empty string to simulate a submission with no network request (useful
+	 * for prototyping without any backend configured).
+	 */
+	action?: string;
+	/**
+	 * Page to redirect to a moment after a successful submission — a measurable
+	 * "thank you" destination that analytics/ads goals can target. Pass an empty
+	 * string to stay on the page instead (the inline success message still shows).
+	 */
+	successRedirect?: string;
+	/** Show the "I agree to the privacy policy" checkbox. Defaults to true. Left unchecked by default — never pre-checked. */
+	showConsent?: boolean;
+	/** Render the name + email + phone fields side by side instead of stacked. */
+	inlineNameEmail?: boolean;
+	/** Hide visible labels and use them as placeholders instead (for minimal-style forms). */
+	placeholderLabels?: boolean;
+	class?: string;
+	submitClass?: string;
+}
+
+const {
+	submitText = contactFormText.submitText,
+	submittingText = contactFormText.submittingText,
+	action = '/api/contact',
+	successRedirect = '/thank-you',
+	showConsent = true,
+	inlineNameEmail = false,
+	placeholderLabels = false,
+	class: className,
+	submitClass,
+} = Astro.props;
+
+const honeypotId = `${HONEYPOT_FIELD_NAME}-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<form
+	class:list={['contact-form', className]}
+	method="post"
+	novalidate
+	data-contact-form
+	data-endpoint={action}
+	data-submitting-text={submittingText}
+	data-success-redirect={successRedirect}
+>
+	<div class:list={['contact-form__row', { 'contact-form__row--inline': inlineNameEmail }]}>
+		<FormField
+			type="text"
+			name="name"
+			label={contactFieldLabels.name}
+			placeholder={placeholderLabels ? contactFieldLabels.name : undefined}
+			hideLabel={placeholderLabels}
+			maxLength={contactFieldLimits.name.max}
+			required
+		/>
+		<FormField
+			type="email"
+			name="email"
+			label={contactFieldLabels.email}
+			placeholder={placeholderLabels ? contactFieldLabels.email : undefined}
+			hideLabel={placeholderLabels}
+			maxLength={contactFieldLimits.email.max}
+			required
+		/>
+		<FormField
+			type="tel"
+			name="phone"
+			label={contactFieldLabels.phone}
+			placeholder={placeholderLabels ? contactFieldLabels.phone : undefined}
+			hideLabel={placeholderLabels}
+			maxLength={contactFieldLimits.phone.max}
+			required
+		/>
+	</div>
+	<FormField
+		type="textarea"
+		name="message"
+		label={contactFieldLabels.message}
+		placeholder={placeholderLabels ? contactFieldLabels.message : undefined}
+		hideLabel={placeholderLabels}
+		maxLength={contactFieldLimits.message.max}
+		rows={4}
+		required
+	/>
+
+	{/* Honeypot: invisible to real visitors, only a bot filling every field ever fills it in. Validated in `src/pages/api/contact.ts`. */}
+	<div class="contact-form__honeypot" aria-hidden="true">
+		<label for={honeypotId}>{contactFormText.honeypotLabel}</label>
+		<input type="text" id={honeypotId} name={HONEYPOT_FIELD_NAME} tabindex="-1" autocomplete="off" />
+	</div>
+
+	{showConsent && <ConsentCheckbox />}
+	<FormStatus />
+	<Button type="submit" class:list={['contact-form__submit', submitClass]}>
+		{submitText}
+	</Button>
+	<noscript>
+		<p class="contact-form__noscript">
+			{contactFormText.noscriptText} {business.email}.
+		</p>
+	</noscript>
+</form>
+
+<script>
+	import { validateContactForm, type ContactData, type ContactResponse } from '../../lib/forms';
+	import { HONEYPOT_FIELD_NAME } from '../../lib/antispam';
+	import { trackEvent } from '../../lib/analytics';
+
+	type FormState = 'idle' | 'submitting' | 'success' | 'error';
+
+	function initContactForms() {
+		document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+			if (form.dataset.contactFormInit) return;
+			form.dataset.contactFormInit = 'true';
+			form.dataset.state = 'idle';
+
+			const status = form.querySelector<HTMLElement>('[data-form-status]');
+			const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+			const idleText = submitButton?.textContent ?? '';
+			const submittingText = form.dataset.submittingText || idleText;
+			const successRedirect = form.dataset.successRedirect || '';
+			const endpoint = form.dataset.endpoint || '';
+
+			const nameInput = form.querySelector<HTMLInputElement>('[name="name"]');
+			const emailInput = form.querySelector<HTMLInputElement>('[name="email"]');
+			const phoneInput = form.querySelector<HTMLInputElement>('[name="phone"]');
+			const messageInput = form.querySelector<HTMLTextAreaElement>('[name="message"]');
+			const honeypotInput = form.querySelector<HTMLInputElement>(`[name="${HONEYPOT_FIELD_NAME}"]`);
+			const consentInput = form.querySelector<HTMLInputElement>('input[type="checkbox"][name="consent"]');
+
+			const setFieldError = (name: string, message?: string) => {
+				const field = form.querySelector<HTMLElement>(`[data-field-name="${name}"]`);
+				const error = field?.querySelector<HTMLElement>('[data-field-error]');
+				const input = field?.querySelector<HTMLInputElement | HTMLTextAreaElement>('input, textarea');
+				if (!field || !error || !input) return;
+
+				if (message) {
+					error.textContent = message;
+					error.hidden = false;
+					input.setAttribute('aria-invalid', 'true');
+				} else {
+					error.hidden = true;
+					input.removeAttribute('aria-invalid');
+				}
+			};
+
+			const setConsentError = (valid: boolean, message?: string) => {
+				const consentError = form.querySelector<HTMLElement>('[data-consent-error]');
+				if (consentError) {
+					if (message) consentError.textContent = message;
+					consentError.hidden = valid;
+				}
+				if (valid) consentInput?.removeAttribute('aria-invalid');
+				else consentInput?.setAttribute('aria-invalid', 'true');
+			};
+
+			const clearAllErrors = () => {
+				setFieldError('name');
+				setFieldError('email');
+				setFieldError('phone');
+				setFieldError('message');
+				setConsentError(true);
+			};
+
+			// As soon as the visitor starts fixing a field, drop its error state —
+			// without ever touching the values already typed in other fields.
+			[nameInput, emailInput, phoneInput, messageInput].forEach((input) => {
+				if (!input) return;
+				input.addEventListener('input', () => {
+					const fieldName = input.closest<HTMLElement>('[data-field-name]')?.dataset.fieldName;
+					if (fieldName) setFieldError(fieldName);
+					if (status && status.dataset.state === 'error') status.hidden = true;
+				});
+			});
+			consentInput?.addEventListener('change', () => {
+				if (consentInput.checked) setConsentError(true);
+			});
+
+			const showStatus = (state: 'success' | 'error', customMessage?: string) => {
+				if (!status) return;
+				const fallback = state === 'success' ? status.dataset.successMessage : status.dataset.errorMessage;
+				status.textContent = customMessage || fallback || '';
+				status.dataset.state = state;
+				// Errors are announced assertively; success stays polite so it doesn't
+				// interrupt anything the user is doing. Both role and aria-live need to
+				// change together — an explicit aria-live overrides role's implicit default.
+				status.setAttribute('role', state === 'error' ? 'alert' : 'status');
+				status.setAttribute('aria-live', state === 'error' ? 'assertive' : 'polite');
+				status.hidden = false;
+			};
+
+			const focusFirstInvalid = () => {
+				window.requestAnimationFrame(() => {
+					form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+				});
+			};
+
+			const focusStatus = () => {
+				window.requestAnimationFrame(() => status?.focus());
+			};
+
+			const setFormState = (state: FormState) => {
+				form.dataset.state = state;
+				const submitting = state === 'submitting';
+				// Keep the button disabled through a pending redirect too, so a stray
+				// click can't trigger a second send while the page is about to navigate away.
+				const busy = submitting || (state === 'success' && Boolean(successRedirect));
+				if (submitButton) {
+					submitButton.disabled = busy;
+					submitButton.setAttribute('aria-busy', String(submitting));
+					submitButton.textContent = submitting ? submittingText : idleText;
+				}
+			};
+
+			form.addEventListener('submit', async (event) => {
+				event.preventDefault();
+
+				// Guard against double submits (double-click, repeated Enter before the button disables).
+				if (form.dataset.state === 'submitting') return;
+
+				const contactData: ContactData = {
+					name: nameInput?.value ?? '',
+					email: emailInput?.value ?? '',
+					phone: phoneInput?.value ?? '',
+					message: messageInput?.value ?? '',
+				};
+
+				// Client-side validation is a UX helper only — inputs keep their values so
+				// the visitor never has to retype anything. The server re-validates for real.
+				const result = validateContactForm(contactData);
+				setFieldError('name', result.errors.name);
+				setFieldError('email', result.errors.email);
+				setFieldError('phone', result.errors.phone);
+				setFieldError('message', result.errors.message);
+
+				const consentValid = !consentInput || !consentInput.required || consentInput.checked;
+				setConsentError(consentValid);
+
+				if (!result.valid || !consentValid) {
+					if (status) status.hidden = true;
+					focusFirstInvalid();
+					return;
+				}
+
+				setFormState('submitting');
+				if (status) status.hidden = true;
+
+				// Built after client validation passes: at this point the payload is
+				// known-good shape-wise, so it's fine to also carry the honeypot/consent
+				// extras the endpoint expects alongside the three real fields.
+				const payload: Record<string, unknown> = { ...contactData };
+				if (honeypotInput) payload[HONEYPOT_FIELD_NAME] = honeypotInput.value;
+				if (consentInput) payload.consent = consentInput.checked;
+
+				try {
+					let response: ContactResponse | null = null;
+
+					if (endpoint) {
+						const fetchResponse = await fetch(endpoint, {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(payload),
+						});
+						response = await fetchResponse.json().catch(() => null);
+
+						if (!fetchResponse.ok || !response?.success) {
+							setFormState('error');
+							if (response?.errors) {
+								setFieldError('name', response.errors.name);
+								setFieldError('email', response.errors.email);
+								setFieldError('phone', response.errors.phone);
+								setFieldError('message', response.errors.message);
+								if (response.errors.consent) setConsentError(false, response.errors.consent);
+							}
+							showStatus('error', response?.message);
+							if (response?.errors && Object.keys(response.errors).length > 0) {
+								focusFirstInvalid();
+							} else {
+								focusStatus();
+							}
+							return;
+						}
+					} else {
+						// No endpoint configured: simulate a network round-trip so the UX stays realistic.
+						await new Promise((resolve) => setTimeout(resolve, 500));
+					}
+
+					setFormState('success');
+					showStatus('success', response?.message);
+					form.reset();
+					clearAllErrors();
+					focusStatus();
+					// No personal data here — just the fact that a submission succeeded.
+					trackEvent({ name: 'form_submit' });
+
+					// Only reached once the endpoint (or the simulated flow above) has
+					// actually confirmed success — never redirect on a failed/partial send.
+					if (successRedirect) {
+						// Give the visible + aria-live confirmation a moment to register before leaving.
+						window.setTimeout(() => {
+							window.location.href = successRedirect;
+						}, 1200);
+					}
+				} catch {
+					setFormState('error');
+					showStatus('error');
+					focusStatus();
+				}
+			});
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', initContactForms);
+	document.addEventListener('astro:page-load', initContactForms);
+</script>
+
+<style>
+	.contact-form {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-sm);
+	}
+
+	.contact-form__row {
+		display: contents;
+	}
+
+	.contact-form__row--inline {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: var(--spacing-sm);
+	}
+
+	.contact-form__honeypot {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		white-space: nowrap;
+		left: -9999px;
+	}
+
+	.contact-form__noscript {
+		margin: 0;
+		padding: 0.65rem 0.9rem;
+		border-radius: var(--radius-base);
+		background-color: var(--color-surface);
+		font-size: 0.85rem;
+		color: var(--color-text-muted);
+	}
+</style>

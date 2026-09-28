@@ -1,0 +1,57 @@
+---
+export interface Props {
+	title: string;
+	description: string;
+	eyebrow?: string;
+	/** Wraps the whole card in a link when provided, making the entire card clickable (not just the text). */
+	href?: string;
+}
+
+const { title, description, eyebrow, href } = Astro.props;
+const Tag = href ? 'a' : 'article';
+---
+
+<Tag class="card-basic" href={href}>
+	{eyebrow && <span class="card-basic__eyebrow">{eyebrow}</span>}
+	<h3 class="card-basic__title">{title}</h3>
+	<p class="card-basic__description">{description}</p>
+</Tag>
+
+<style>
+	.card-basic {
+		display: block;
+		height: 100%;
+		padding: var(--spacing-md);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-base);
+		background-color: var(--color-background);
+		color: inherit;
+		text-decoration: none;
+		transition: border-color 0.2s ease, transform 0.2s ease;
+	}
+
+	.card-basic:hover {
+		border-color: var(--color-primary);
+		transform: translateY(-2px);
+	}
+
+	.card-basic__eyebrow {
+		display: inline-block;
+		margin-bottom: var(--spacing-xs);
+		color: var(--color-secondary);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.card-basic__title {
+		margin: 0 0 0.5rem;
+		font-size: 1.15rem;
+	}
+
+	.card-basic__description {
+		margin: 0;
+		color: var(--color-text-muted);
+	}
+</style>

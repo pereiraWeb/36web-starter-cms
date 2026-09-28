@@ -1,0 +1,183 @@
+---
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import ResponsiveImage from './ResponsiveImage.astro';
+import { textImageContent } from '../../config/textImageContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import { imageFallbacks } from '../../config/images';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+	image?: string;
+	imageAlt?: string;
+	/**
+	 * `"row"` (default) places text and image side by side. `"column"` stacks
+	 * them full-width, one above the other — combine with `reverse` to choose
+	 * whether the image goes on top or the text does.
+	 */
+	layout?: 'row' | 'column';
+	/**
+	 * Puts the image before the text: on the left in `"row"` layout, or on
+	 * top in `"column"` layout. Leave `false` for text-before-image (text
+	 * left / text on top).
+	 */
+	reverse?: boolean;
+	/** Any valid CSS length for the section height (e.g. "100vh", "600px", "auto"). Defaults to full viewport height. */
+	height?: string;
+	/**
+	 * This is a content section, not a hero/header — by default it's kept to the
+	 * page's normal content width (`--max-width`), like any other section. Set to
+	 * `true` to opt into a full-bleed, edge-to-edge layout instead.
+	 */
+	fullWidth?: boolean;
+	/** Set when this section sits above the fold (e.g. right under the hero) and its image is the page's LCP candidate. */
+	priority?: boolean;
+}
+
+const {
+	eyebrow = textImageContent.eyebrow,
+	title = textImageContent.title,
+	description = textImageContent.description,
+	ctaText = textImageContent.ctaText,
+	ctaHref = textImageContent.ctaHref,
+	image = imageFallbacks.photo,
+	imageAlt = title,
+	layout = 'row',
+	reverse = false,
+	height = textImageContent.height,
+	fullWidth = false,
+	priority = false,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--text-image-height': height });
+---
+
+<section
+	class:list={[
+		'text-image',
+		{ 'text-image--reverse': reverse, 'text-image--full': fullWidth, 'text-image--column': layout === 'column' },
+	]}
+	style={style}
+>
+	<div class="text-image__content">
+		<div class="text-image__content-inner">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				titleClass="text-image__title"
+				description={description}
+				descriptionClass="text-image__description"
+			/>
+			{ctaText && <Button href={ctaHref} class="text-image__cta">{ctaText}</Button>}
+		</div>
+	</div>
+	<div class="text-image__media">
+		<ResponsiveImage src={image} alt={imageAlt} width={800} height={600} priority={priority} />
+	</div>
+</section>
+
+<style>
+	/* Two-column layout: one div for text, one div for the image. The image div
+	   clips its `<img>` with object-fit: cover so the photo always fills the box
+	   completely, regardless of its native aspect ratio. This is a content
+	   section, not a hero/header, so by default it's kept to the page's normal
+	   content width (like `Container`) — pass `fullWidth` to bleed it edge-to-edge. */
+	.text-image {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		width: 100%;
+		max-width: var(--max-width);
+		margin-inline: auto;
+		padding-inline: var(--spacing-sm);
+		min-height: var(--text-image-height, 100vh);
+		gap: var(--spacing-xl)
+	}
+
+	.text-image--full {
+		max-width: none;
+		padding-inline: 0;
+	}
+
+	/* Stacks text and image full-width, one above the other, instead of side by side. */
+	.text-image--column {
+		grid-template-columns: 1fr;
+	}
+
+	.text-image--reverse .text-image__content {
+		order: 2;
+	}
+
+	.text-image--reverse .text-image__media {
+		order: 1;
+	}
+
+	.text-image__content {
+		display: flex;
+		align-items: center;
+	}
+
+	.text-image__content-inner {
+		width: 100%;
+		
+		margin-inline: auto;
+	}
+
+	/* :global() below because these are now rendered by the `SectionHeading` child component, outside this component's scoped-CSS boundary. */
+	:global(.text-image__title) {
+		font-size: clamp(2rem, 4vw, 2.75rem);
+		line-height: 1.15;
+	}
+
+	:global(.text-image__description) {
+		color: var(--color-text-muted);
+		font-size: 1.05rem;
+	}
+
+	:global(.text-image__cta) {
+		margin-top: var(--spacing-sm);
+	}
+
+	.text-image__media {
+		position: relative;
+		overflow: hidden;
+		min-height: 320px;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `ResponsiveImage` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.text-image__media img) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	@media (max-width: 768px) {
+		.text-image {
+			grid-template-columns: 1fr;
+			min-height: auto;
+		}
+
+		/* Row layout always stacks text-first on mobile, ignoring `reverse` — but
+		   column layout is an explicit stacked choice, so its `reverse` order is
+		   kept at every viewport size. */
+		.text-image:not(.text-image--column).text-image--reverse .text-image__content,
+		.text-image:not(.text-image--column).text-image--reverse .text-image__media {
+			order: initial;
+		}
+
+		.text-image__media {
+			min-height: 320px;
+		}
+
+		.text-image__content-inner {
+			
+		}
+	}
+</style>

@@ -1,0 +1,95 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+/** Reusable row/column list of icon links (social, contact, WhatsApp, or any combination). */
+export interface IconLinkItem {
+	icon: IconName;
+	href: string;
+	/** Accessible label, e.g. "Facebook" or "WhatsApp". */
+	label: string;
+	/** Defaults to `_blank` for absolute http(s) links, otherwise unset. */
+	target?: string;
+}
+
+export interface Props {
+	items: IconLinkItem[];
+	direction?: 'row' | 'column';
+	/** Any valid CSS length (e.g. "0.5rem", "12px"). */
+	gap?: string;
+	/** Any valid CSS color. Defaults to `currentColor` so it inherits from its container. */
+	color?: string;
+	/** Icon color on hover/focus. Defaults to `var(--color-primary)`. */
+	hoverColor?: string;
+	size?: number | string;
+	class?: string;
+}
+
+const {
+	items,
+	direction = 'row',
+	gap = '0.75rem',
+	color = 'currentColor',
+	hoverColor = 'var(--color-primary)',
+	size = 20,
+	class: className,
+} = Astro.props;
+
+const style = `--icon-links-gap: ${gap}; --icon-links-color: ${color}; --icon-links-hover-color: ${hoverColor};`;
+---
+
+{
+	items.length > 0 && (
+		<ul class:list={['icon-links', `icon-links--${direction}`, className]} style={style}>
+			{items.map((item) => {
+				const isExternal = /^https?:\/\//.test(item.href);
+				const target = item.target ?? (isExternal ? '_blank' : undefined);
+				return (
+					<li>
+						<a
+							href={item.href}
+							aria-label={item.label}
+							target={target}
+							rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+						>
+							<Icon name={item.icon} size={size} />
+						</a>
+					</li>
+				);
+			})}
+		</ul>
+	)
+}
+
+<style>
+	.icon-links {
+		display: flex;
+		gap: var(--icon-links-gap);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.icon-links--row {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.icon-links--column {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.icon-links a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--icon-links-color);
+		transition: color 0.2s ease, transform 0.2s ease;
+	}
+
+	.icon-links a:hover,
+	.icon-links a:focus-visible {
+		color: var(--icon-links-hover-color);
+		transform: translateY(-1px);
+	}
+</style>

@@ -1,0 +1,58 @@
+---
+import { agencyCreditContent } from '../../config/agencyCreditContent';
+
+/** Small "made with" attribution line used in every `Footer*` variant. Fully customizable and reusable anywhere. */
+export interface Props {
+	text?: string;
+	/** Rendered in `--color-primary`, before `linkMiddle` (e.g. a terminal-style prompt symbol). */
+	linkPrefix?: string;
+	/** Rendered in the footer's regular muted text color. */
+	linkMiddle?: string;
+	/** Rendered in `--color-primary`, after `linkMiddle` (e.g. the TLD plus a blinking-cursor style underscore). */
+	linkSuffix?: string;
+	href?: string;
+	class?: string;
+}
+
+const {
+	text = agencyCreditContent.text,
+	linkPrefix = agencyCreditContent.linkPrefix,
+	linkMiddle = agencyCreditContent.linkMiddle,
+	linkSuffix = agencyCreditContent.linkSuffix,
+	href = agencyCreditContent.href,
+	class: className,
+} = Astro.props;
+---
+
+<p class:list={['agency-credit', className]}>
+	{text}{' '}
+	<a href={href} target="_blank" rel="noopener noreferrer">
+		<span class="agency-credit__accent">{linkPrefix}</span>{linkMiddle}<span class="agency-credit__accent"
+			>{linkSuffix}</span
+		>
+	</a>
+</p>
+
+<style>
+	.agency-credit {
+		margin: 0;
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
+	}
+
+	.agency-credit a {
+		color: inherit;
+		font-weight: 600;
+		text-decoration: none!important;
+	}
+
+	.agency-credit a:hover {
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+
+	.agency-credit__accent {
+		color: var(--color-primary);
+		
+	}
+</style>

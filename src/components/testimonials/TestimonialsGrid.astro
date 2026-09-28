@@ -1,0 +1,65 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardTestimonial from '../cards/CardTestimonial.astro';
+import { testimonials, testimonialsContent } from '../../config/testimonialsContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = testimonialsContent.grid.eyebrow,
+	title = testimonialsContent.grid.title,
+	description = testimonialsContent.grid.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="testimonials-grid" style={style}>
+	<Container>
+		<div class="testimonials-grid__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="testimonials-grid__list">
+			{testimonials.map((testimonial) => (
+				<li>
+					<CardTestimonial
+						quote={testimonial.quote}
+						author={testimonial.author}
+						role={testimonial.role}
+						avatar={testimonial.avatar}
+						rating={testimonial.rating}
+					/>
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.testimonials-grid__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+	}
+
+
+	.testimonials-grid__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>

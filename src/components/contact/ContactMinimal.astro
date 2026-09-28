@@ -1,0 +1,75 @@
+---
+import Container from '../ui/Container.astro';
+import { ContactForm } from '../forms';
+import { contactContent } from '../../config/contactContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	title?: string;
+	description?: string;
+	submitText?: string;
+}
+
+const {
+	title = contactContent.minimal.title,
+	description = contactContent.minimal.description,
+	submitText = contactContent.minimal.submitText,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="contact-minimal" style={style}>
+	<Container class="contact-minimal__inner">
+		<h2>{title}</h2>
+		{description && <p class="contact-minimal__description">{description}</p>}
+		<ContactForm class="contact-minimal__form" submitText={submitText} placeholderLabels />
+	</Container>
+</section>
+
+<style>
+	:global(.contact-minimal__inner) {
+		max-width: 480px;
+	}
+
+	.contact-minimal__description {
+		color: var(--color-text-muted);
+	}
+
+	:global(.contact-minimal__form) {
+		margin-top: var(--spacing-md);
+		gap: var(--spacing-sm);
+	}
+
+	/* `!important` because this needs to beat `FormField.astro`'s own scoped
+	   border rule, which can otherwise tie or win on specificity depending on
+	   how Astro's per-page CSS gets chunked. */
+	:global(.contact-minimal__form .form-field input),
+	:global(.contact-minimal__form .form-field textarea) {
+		padding: 0.65rem 0 !important;
+		border: none !important;
+		border-bottom: 1px solid var(--color-text-muted) !important;
+		border-radius: 0 !important;
+		background: transparent !important;
+		box-shadow: none !important;
+	}
+
+	:global(.contact-minimal__form .form-field input:focus),
+	:global(.contact-minimal__form .form-field textarea:focus) {
+		outline: none !important;
+		border-color: var(--color-primary) !important;
+	}
+
+	/* Stronger cue for keyboard focus specifically, since this variant's underline-only inputs have no box to ring. */
+	:global(.contact-minimal__form .form-field input:focus-visible),
+	:global(.contact-minimal__form .form-field textarea:focus-visible) {
+		background-color: color-mix(in srgb, var(--color-primary) 6%, transparent) !important;
+	}
+
+	:global(.contact-minimal__submit) {
+		align-self: flex-start;
+		margin-top: var(--spacing-xs);
+	}
+</style>

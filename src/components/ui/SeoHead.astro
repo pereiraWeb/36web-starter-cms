@@ -1,0 +1,37 @@
+---
+import { getSeoMeta, type SeoProps } from '../../lib/seo';
+import { seoDefaults } from '../../config/seo';
+
+/**
+ * Every `<head>` SEO tag for a page, in one place: title, description,
+ * canonical, robots, Open Graph and Twitter Card tags. Used once per page by
+ * `BusinessLayout.astro` — pass these props through the layout's own props
+ * rather than rendering this component directly.
+ */
+export interface Props extends SeoProps {}
+
+const seo = getSeoMeta(Astro.url, Astro.props);
+---
+
+<title>{seo.title}</title>
+<meta name="description" content={seo.description} />
+<link rel="canonical" href={seo.canonical} />
+<meta name="robots" content={seo.robots} />
+
+<meta property="og:title" content={seo.title} />
+<meta property="og:description" content={seo.description} />
+<meta property="og:url" content={seo.canonical} />
+<meta property="og:type" content={seo.type} />
+<meta property="og:site_name" content={seo.siteName} />
+<meta property="og:locale" content={seo.locale} />
+<meta property="og:image" content={seo.image.src} />
+<meta property="og:image:type" content={seo.image.mimeType} />
+<meta property="og:image:width" content={String(seo.image.width)} />
+<meta property="og:image:height" content={String(seo.image.height)} />
+<meta property="og:image:alt" content={seo.image.alt} />
+
+<meta name="twitter:card" content={seoDefaults.twitterCard} />
+<meta name="twitter:title" content={seo.title} />
+<meta name="twitter:description" content={seo.description} />
+<meta name="twitter:image" content={seo.image.src} />
+<meta name="twitter:image:alt" content={seo.image.alt} />

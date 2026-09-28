@@ -1,0 +1,487 @@
+---
+import { cookieConsentContent } from '../../config/cookieConsentContent';
+
+/**
+ * Real consent manager: a first-layer banner (accept all / reject all /
+ * configure) plus a detailed preferences panel with one toggle per category
+ * (necessary, analytics, marketing). The choice — including its version and
+ * timestamp — is stored via `src/lib/consent.ts`, which every consent-aware
+ * integration (`src/lib/analytics.ts`, `ConsentGate.astro`) reacts to. Reopen
+ * this panel anytime via the permanent "Gestionar cookies" link rendered in
+ * every footer (see `cookiePreferencesHref` in `src/config/navigation.ts`).
+ */
+export interface Props {
+	/** Any valid CSS color. Defaults to `var(--color-primary)`. */
+	color?: string;
+	class?: string;
+}
+
+const { color = 'var(--color-primary)', class: className } = Astro.props;
+const style = `--cookie-consent-color: ${color};`;
+---
+
+<div class:list={['cookie-consent', className]} style={style}>
+	<div class="cookie-consent__banner" data-cookie-banner role="dialog" aria-label={cookieConsentContent.banner.title} hidden>
+		<div class="cookie-consent__banner-text">
+			<p class="cookie-consent__title">{cookieConsentContent.banner.title}</p>
+			<p class="cookie-consent__message">
+				{cookieConsentContent.banner.message}{' '}
+				{cookieConsentContent.banner.policyText && cookieConsentContent.banner.policyHref && (
+					<a href={cookieConsentContent.banner.policyHref} class="cookie-consent__link">
+						{cookieConsentContent.banner.policyText}
+					</a>
+				)}
+			</p>
+		</div>
+		<div class="cookie-consent__actions">
+			<button type="button" class="cookie-consent__btn cookie-consent__btn--ghost" data-cookie-manage>
+				{cookieConsentContent.banner.manageText}
+			</button>
+			<button type="button" class="cookie-consent__btn cookie-consent__btn--outline" data-cookie-reject-all>
+				{cookieConsentContent.banner.rejectAllText}
+			</button>
+			<button type="button" class="cookie-consent__btn cookie-consent__btn--accept" data-cookie-accept-all>
+				{cookieConsentContent.banner.acceptAllText}
+			</button>
+		</div>
+	</div>
+
+	<div class="cookie-consent__overlay" data-cookie-modal-overlay hidden>
+		<div class="cookie-consent__modal" role="dialog" aria-modal="true" aria-labelledby="cookie-preferences-title" data-cookie-modal>
+			<div class="cookie-consent__modal-header">
+				<h2 id="cookie-preferences-title">{cookieConsentContent.preferences.title}</h2>
+				<button
+					type="button"
+					class="cookie-consent__close"
+					data-cookie-close
+					aria-label={cookieConsentContent.preferences.closeLabel}
+				>
+					&times;
+				</button>
+			</div>
+			<p class="cookie-consent__modal-description">{cookieConsentContent.preferences.description}</p>
+
+			<ul class="cookie-consent__categories">
+				{cookieConsentContent.categories.map((category) => (
+					<li class="cookie-consent__category">
+						<div class="cookie-consent__category-header">
+							<label class="cookie-consent__category-label">
+								<input
+									type="checkbox"
+									checked={category.required ? true : undefined}
+									disabled={category.required}
+									data-cookie-category={category.id}
+								/>
+								<span>{category.title}</span>
+							</label>
+							{category.required && <span class="cookie-consent__badge">Siempre activas</span>}
+						</div>
+						<p class="cookie-consent__category-description">{category.description}</p>
+					</li>
+				))}
+			</ul>
+
+			<div class="cookie-consent__modal-actions">
+				<button type="button" class="cookie-consent__btn cookie-consent__btn--outline" data-cookie-reject-all>
+					{cookieConsentContent.preferences.rejectAllText}
+				</button>
+				<button type="button" class="cookie-consent__btn cookie-consent__btn--outline" data-cookie-accept-all>
+					{cookieConsentContent.preferences.acceptAllText}
+				</button>
+				<button type="button" class="cookie-consent__btn cookie-consent__btn--accept" data-cookie-save>
+					{cookieConsentContent.preferences.saveText}
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	import {
+		getConsent,
+		setConsent,
+		acceptAll,
+		rejectAll,
+		hasStoredChoice,
+		onConsentChange,
+		onOpenConsentPreferences,
+		type ConsentCategoryState,
+	} from '../../lib/consent';
+
+	function initCookieConsent() {
+		document.querySelectorAll<HTMLElement>('.cookie-consent').forEach((root) => {
+			if (root.dataset.cookieConsentInit) return;
+			root.dataset.cookieConsentInit = 'true';
+
+			const banner = root.querySelector<HTMLElement>('[data-cookie-banner]');
+			const overlay = root.querySelector<HTMLElement>('[data-cookie-modal-overlay]');
+			const modal = root.querySelector<HTMLElement>('[data-cookie-modal]');
+			const categoryInputs = root.querySelectorAll<HTMLInputElement>('[data-cookie-category]');
+
+			const readFormState = (): ConsentCategoryState => {
+				const state: ConsentCategoryState = { analytics: false, marketing: false };
+				categoryInputs.forEach((input) => {
+					const id = input.dataset.cookieCategory;
+					if (id === 'analytics' || id === 'marketing') state[id] = input.checked;
+				});
+				return state;
+			};
+
+			const writeFormState = (state: ConsentCategoryState) => {
+				categoryInputs.forEach((input) => {
+					const id = input.dataset.cookieCategory;
+					if (id === 'analytics') input.checked = state.analytics;
+					if (id === 'marketing') input.checked = state.marketing;
+				});
+			};
+
+			const showBanner = () => {
+				if (!banner) return;
+				banner.hidden = false;
+				requestAnimationFrame(() => banner.classList.add('cookie-consent__banner--visible'));
+			};
+
+			const hideBanner = () => {
+				if (!banner) return;
+				banner.classList.remove('cookie-consent__banner--visible');
+				window.setTimeout(() => {
+					banner.hidden = true;
+				}, 200);
+			};
+
+			const openModal = () => {
+				writeFormState(getConsent()?.categories ?? { analytics: false, marketing: false });
+				overlay?.removeAttribute('hidden');
+				window.requestAnimationFrame(() => overlay?.classList.add('cookie-consent__overlay--visible'));
+				window.setTimeout(() => modal?.querySelector<HTMLElement>('input, button')?.focus(), 50);
+			};
+
+			const closeModal = (options: { reopenBannerIfUndecided?: boolean } = {}) => {
+				overlay?.classList.remove('cookie-consent__overlay--visible');
+				window.setTimeout(() => overlay?.setAttribute('hidden', ''), 200);
+				if (options.reopenBannerIfUndecided && !hasStoredChoice()) showBanner();
+			};
+
+			if (!hasStoredChoice()) showBanner();
+
+			root.querySelectorAll('[data-cookie-accept-all]').forEach((btn) =>
+				btn.addEventListener('click', () => {
+					acceptAll();
+					hideBanner();
+					closeModal();
+				}),
+			);
+
+			root.querySelectorAll('[data-cookie-reject-all]').forEach((btn) =>
+				btn.addEventListener('click', () => {
+					rejectAll();
+					hideBanner();
+					closeModal();
+				}),
+			);
+
+			root.querySelector('[data-cookie-manage]')?.addEventListener('click', () => {
+				hideBanner();
+				openModal();
+			});
+
+			root.querySelector('[data-cookie-save]')?.addEventListener('click', () => {
+				setConsent(readFormState());
+				hideBanner();
+				closeModal();
+			});
+
+			root.querySelector('[data-cookie-close]')?.addEventListener('click', () => closeModal({ reopenBannerIfUndecided: true }));
+			overlay?.addEventListener('click', (event) => {
+				if (event.target === overlay) closeModal({ reopenBannerIfUndecided: true });
+			});
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && overlay && !overlay.hidden) closeModal({ reopenBannerIfUndecided: true });
+			});
+
+			// The permanent "Gestionar cookies" link rendered by every footer
+			// variant (see `cookiePreferencesHref` in `src/config/navigation.ts`)
+			// points at this hash instead of a real page — intercept clicks on it
+			// anywhere in the document and open the preferences panel instead.
+			document.addEventListener('click', (event) => {
+				const target = (event.target as HTMLElement | null)?.closest('a[href="#cookie-preferences"]');
+				if (!target) return;
+				event.preventDefault();
+				hideBanner();
+				openModal();
+			});
+
+			onOpenConsentPreferences(() => {
+				hideBanner();
+				openModal();
+			});
+
+			// A choice made elsewhere on the same page (e.g. accepting inline via a
+			// `ConsentGate` placeholder) already counts as a decision — don't keep
+			// nagging with the banner afterwards.
+			onConsentChange(() => hideBanner());
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', initCookieConsent);
+	document.addEventListener('astro:page-load', initCookieConsent);
+</script>
+
+<style>
+	.cookie-consent__banner {
+		position: fixed;
+		left: 50%;
+		bottom: 1.25rem;
+		z-index: 100;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--spacing-md);
+		max-width: 720px;
+		width: calc(100% - 2.5rem);
+		padding: var(--spacing-md);
+		border-radius: calc(var(--radius-base) * 1.5);
+		background-color: var(--color-background);
+		border: 1px solid var(--color-border);
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+		transform: translate(-50%, 1rem);
+		opacity: 0;
+		transition:
+			opacity 0.25s ease,
+			transform 0.25s ease;
+	}
+
+	.cookie-consent__banner--visible {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+
+	/*
+	 * `display: flex` above has the same specificity as the user-agent
+	 * stylesheet's `[hidden] { display: none }`, so without this rule our
+	 * own style would win and the banner would stay in the layout (and keep
+	 * capturing clicks) even while the `hidden` attribute is set. This
+	 * `[hidden]` selector is more specific, so it correctly takes priority.
+	 */
+	.cookie-consent__banner[hidden] {
+		display: none;
+	}
+
+	.cookie-consent__banner-text {
+		flex: 1;
+		min-width: 220px;
+	}
+
+	.cookie-consent__title {
+		margin: 0 0 0.25rem;
+		font-weight: 700;
+	}
+
+	.cookie-consent__message {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--color-text-muted);
+	}
+
+	.cookie-consent__link {
+		margin-left: 0.35rem;
+		font-weight: 600;
+		color: var(--cookie-consent-color, var(--color-primary));
+	}
+
+	.cookie-consent__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		flex-shrink: 0;
+	}
+
+	.cookie-consent__btn {
+		padding: 0.55rem 1.1rem;
+		border: 1px solid transparent;
+		border-radius: var(--radius-base);
+		font: inherit;
+		font-weight: 600;
+		font-size: 0.9rem;
+		cursor: pointer;
+		transition:
+			opacity 0.2s ease,
+			transform 0.2s ease;
+	}
+
+	.cookie-consent__btn:hover {
+		transform: translateY(-1px);
+	}
+
+	.cookie-consent__btn--accept {
+		background-color: var(--cookie-consent-color, var(--color-primary));
+		color: #fff;
+	}
+
+	.cookie-consent__btn--outline {
+		background-color: transparent;
+		border-color: var(--color-border);
+		color: var(--color-text);
+	}
+
+	.cookie-consent__btn--ghost {
+		background-color: transparent;
+		border-color: transparent;
+		color: var(--color-text-muted);
+		text-decoration: underline;
+	}
+
+	.cookie-consent__overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 110;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--spacing-md);
+		background-color: rgba(15, 23, 42, 0.5);
+		opacity: 0;
+		transition: opacity 0.2s ease;
+	}
+
+	.cookie-consent__overlay--visible {
+		opacity: 1;
+	}
+
+	/*
+	 * Same fix as `.cookie-consent__banner[hidden]` above, but far more
+	 * critical here: this overlay is `position: fixed; inset: 0`, so without
+	 * this rule it silently covers (and blocks clicks on) the ENTIRE page,
+	 * at all times, invisible (`opacity: 0`) — even though its `hidden`
+	 * attribute is set — because `display: flex` above otherwise wins the
+	 * cascade over the user-agent's `[hidden] { display: none }`.
+	 */
+	.cookie-consent__overlay[hidden] {
+		display: none;
+	}
+
+	.cookie-consent__modal {
+		width: 100%;
+		max-width: 560px;
+		max-height: min(85vh, 640px);
+		overflow-y: auto;
+		padding: var(--spacing-lg);
+		border-radius: calc(var(--radius-base) * 1.5);
+		background-color: var(--color-background);
+		box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+	}
+
+	.cookie-consent__modal-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: var(--spacing-sm);
+	}
+
+	.cookie-consent__modal-header h2 {
+		margin: 0;
+		font-size: 1.15rem;
+	}
+
+	.cookie-consent__close {
+		flex-shrink: 0;
+		width: 2rem;
+		height: 2rem;
+		border: none;
+		border-radius: 50%;
+		background: transparent;
+		font-size: 1.25rem;
+		line-height: 1;
+		color: var(--color-text-muted);
+		cursor: pointer;
+	}
+
+	.cookie-consent__close:hover {
+		background-color: var(--color-surface);
+	}
+
+	.cookie-consent__modal-description {
+		margin: 0.5rem 0 0;
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+	}
+
+	.cookie-consent__categories {
+		list-style: none;
+		margin: var(--spacing-md) 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-sm);
+	}
+
+	.cookie-consent__category {
+		padding: var(--spacing-sm);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-base);
+	}
+
+	.cookie-consent__category-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--spacing-sm);
+	}
+
+	.cookie-consent__category-label {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.cookie-consent__category-label input {
+		width: 1.1rem;
+		height: 1.1rem;
+		accent-color: var(--cookie-consent-color, var(--color-primary));
+	}
+
+	.cookie-consent__category-label input:disabled {
+		cursor: not-allowed;
+	}
+
+	.cookie-consent__badge {
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--color-text-muted);
+	}
+
+	.cookie-consent__category-description {
+		margin: 0.4rem 0 0;
+		font-size: 0.85rem;
+		color: var(--color-text-muted);
+	}
+
+	.cookie-consent__modal-actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 0.6rem;
+	}
+
+	@media (max-width: 560px) {
+		.cookie-consent__banner {
+			flex-direction: column;
+			align-items: stretch;
+			bottom: 0.75rem;
+		}
+
+		.cookie-consent__actions {
+			justify-content: flex-end;
+		}
+
+		.cookie-consent__modal-actions {
+			flex-direction: column-reverse;
+		}
+
+		.cookie-consent__modal-actions .cookie-consent__btn {
+			width: 100%;
+		}
+	}
+</style>

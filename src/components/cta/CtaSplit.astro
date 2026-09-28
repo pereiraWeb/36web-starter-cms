@@ -1,0 +1,113 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { ctaContent } from '../../config/ctaContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+	/** Any valid CSS length (e.g. "auto", "320px", "50vh"). */
+	height?: string;
+}
+
+const {
+	eyebrow = ctaContent.split.eyebrow,
+	title = ctaContent.split.title,
+	description = ctaContent.split.description,
+	ctaText = ctaContent.split.ctaText,
+	ctaHref = ctaContent.split.ctaHref,
+	height = ctaContent.split.height,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--cta-split-height': height });
+---
+
+<section class="cta-split" style={style}>
+	<Container class="cta-split__inner">
+		<div class="cta-split__text">
+			<SectionHeading
+				eyebrow={eyebrow}
+				eyebrowClass="cta-split__eyebrow"
+				title={title}
+				titleClass="cta-split__title"
+				description={description}
+				descriptionClass="cta-split__description"
+			/>
+		</div>
+		<div class="cta-split__action">
+			<Button href={ctaHref} size="lg" track="cta_click" trackLabel={ctaText}>{ctaText}</Button>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.cta-split {
+		width: 100%;
+		min-height: var(--cta-split-height, auto);
+		display: flex;
+		align-items: center;
+		padding-block: var(--spacing-xl);
+		background-color: var(--color-surface);
+		border-top: 1px solid var(--color-border);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	:global(.cta-split__inner) {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--spacing-md);
+	}
+
+	.cta-split__text {
+		max-width: 560px;
+	}
+
+	/* :global() below because these are now rendered by the `SectionHeading` child component, outside this component's scoped-CSS boundary. */
+	:global(.cta-split__eyebrow) {
+		display: inline-block;
+		margin-bottom: var(--spacing-xs);
+		color: var(--color-secondary);
+		font-size: 0.85rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	:global(.cta-split__title) {
+		font-size: clamp(1.5rem, 3vw, 2.25rem);
+		line-height: 1.2;
+	}
+
+	:global(.cta-split__description) {
+		margin-top: var(--spacing-xs);
+		color: var(--color-text-muted);
+	}
+
+	.cta-split__action {
+		flex-shrink: 0;
+	}
+
+	@media (max-width: 720px) {
+		:global(.cta-split__inner) {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.cta-split__action {
+			width: 100%;
+		}
+
+		.cta-split__action :global(.btn) {
+			width: 100%;
+		}
+	}
+</style>

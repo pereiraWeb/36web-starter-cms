@@ -1,0 +1,102 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { ctaContent } from '../../config/ctaContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+	secondaryCtaText?: string;
+	secondaryCtaHref?: string;
+	/** Any valid CSS length (e.g. "auto", "320px", "50vh"). */
+	height?: string;
+}
+
+const {
+	eyebrow = ctaContent.centered.eyebrow,
+	title = ctaContent.centered.title,
+	description = ctaContent.centered.description,
+	ctaText = ctaContent.centered.ctaText,
+	ctaHref = ctaContent.centered.ctaHref,
+	secondaryCtaText = ctaContent.centered.secondaryCtaText,
+	secondaryCtaHref = ctaContent.centered.secondaryCtaHref,
+	height = ctaContent.centered.height,
+	backgroundColor = 'var(--color-primary)',
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--cta-centered-height': height });
+---
+
+<section class="cta-centered" style={style}>
+	<Container class="cta-centered__inner">
+	<SectionHeading
+		eyebrow={eyebrow}
+		eyebrowClass="cta-centered__eyebrow"
+		title={title}
+		titleClass="cta-centered__title"
+		description={description}
+		descriptionClass="cta-centered__description"
+	/>
+		<div class="cta-centered__actions">
+			<Button href={ctaHref} variant="inverse" track="cta_click" trackLabel={ctaText}>{ctaText}</Button>
+			{secondaryCtaText && <Button href={secondaryCtaHref} variant="inverse-outline">{secondaryCtaText}</Button>}
+		</div>
+	</Container>
+</section>
+
+<style>
+	.cta-centered {
+		width: 100%;
+		min-height: var(--cta-centered-height, auto);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding-block: var(--spacing-xl);
+		background-color: var(--color-primary);
+		color: var(--color-background);
+		text-align: center;
+	}
+
+	:global(.cta-centered__inner) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	/* :global() below because these are now rendered by the `SectionHeading` child component, outside this component's scoped-CSS boundary. */
+	:global(.cta-centered__eyebrow) {
+		margin-bottom: var(--spacing-xs);
+		color: color-mix(in srgb, var(--color-background) 85%, transparent);
+		font-size: 0.85rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	:global(.cta-centered__title) {
+		color: var(--color-background);
+		font-size: clamp(1.75rem, 4vw, 2.75rem);
+		line-height: 1.2;
+	}
+
+	:global(.cta-centered__description) {
+		max-width: 560px;
+		margin-top: var(--spacing-xs);
+		color: color-mix(in srgb, var(--color-background) 85%, transparent);
+		font-size: 1.1rem;
+	}
+
+	.cta-centered__actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--spacing-sm);
+		margin-top: var(--spacing-md);
+	}
+</style>

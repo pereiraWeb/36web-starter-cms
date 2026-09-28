@@ -1,0 +1,122 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { business } from '../../config/business';
+import { heroContent, type HeroStat } from '../../config/heroContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+	stats?: HeroStat[];
+	/** Any valid CSS length (e.g. "auto", "480px", "70vh"). */
+	height?: string;
+}
+
+const {
+	eyebrow,
+	title = business.name,
+	description = business.tagline,
+	ctaText = heroContent.features.ctaText,
+	ctaHref = heroContent.features.ctaHref,
+	stats = heroContent.features.stats,
+	height = heroContent.features.height,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--hero-height': height });
+---
+
+<section class="hero-features" style={style}>
+	<Container class="hero-features__inner">
+		<div class="hero-features__content">
+			<SectionHeading
+				as="h1"
+				eyebrow={eyebrow}
+				title={title}
+				titleClass="hero-features__title"
+				description={description}
+				descriptionClass="hero-features__description"
+			/>
+			<Button href={ctaHref} class="hero-features__cta">{ctaText}</Button>
+		</div>
+		{stats.length > 0 && (
+			<ul class="hero-features__stats">
+				{stats.map((stat) => (
+					<li class="hero-features__stat">
+						<span class="hero-features__stat-value">{stat.value}</span>
+						<span class="hero-features__stat-label">{stat.label}</span>
+					</li>
+				))}
+			</ul>
+		)}
+	</Container>
+</section>
+
+<style>
+	.hero-features {
+		width: 100%;
+		min-height: var(--hero-height, auto);
+		display: flex;
+		align-items: center;
+		background-color: var(--color-surface);
+	}
+
+	:global(.hero-features__inner) {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-lg);
+	}
+
+	.hero-features__content {
+		max-width: 640px;
+	}
+
+	/* :global() below because these are now rendered by the `SectionHeading` child component, outside this component's scoped-CSS boundary. */
+	:global(.hero-features__title) {
+		font-size: clamp(2.25rem, 4.5vw, 3.25rem);
+		line-height: 1.15;
+	}
+
+	:global(.hero-features__description) {
+		color: var(--color-text-muted);
+		font-size: 1.1rem;
+	}
+
+	:global(.hero-features__cta) {
+		margin-top: var(--spacing-xs);
+	}
+
+	.hero-features__stats {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: var(--spacing-lg) 0 0;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.hero-features__stat {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.hero-features__stat-value {
+		font-size: clamp(1.75rem, 3vw, 2.25rem);
+		font-weight: 700;
+		color: var(--color-primary);
+	}
+
+	.hero-features__stat-label {
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+	}
+</style>

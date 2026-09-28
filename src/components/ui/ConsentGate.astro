@@ -1,0 +1,137 @@
+---
+import { consentGateContent } from '../../config/cookieConsentContent';
+
+/**
+ * Wraps any third-party embed (YouTube video, Google Maps, ad widgets...) so
+ * it never loads — and never sets its cookies — until the visitor has
+ * granted the relevant consent category. The embed markup passed via the
+ * default slot is placed inside an inert `<template>` on the server, so the
+ * browser never requests its resources (e.g. the `<iframe src>`) until this
+ * component's script moves it into the real DOM after consent is granted.
+ *
+ * See `src/components/media/YoutubeEmbed.astro` and `MapEmbed.astro` for
+ * ready-made usages.
+ */
+export interface Props {
+	/** Cookie category required before the gated content loads. */
+	category?: 'analytics' | 'marketing';
+	title?: string;
+	message?: string;
+	acceptText?: string;
+	/** Fixed aspect ratio for the placeholder (e.g. `"16 / 9"`) so the layout doesn't jump once the content loads. */
+	aspectRatio?: string;
+	class?: string;
+}
+
+const {
+	category = 'marketing',
+	title = consentGateContent.title,
+	message = consentGateContent.message,
+	acceptText = consentGateContent.acceptText,
+	aspectRatio,
+	class: className,
+} = Astro.props;
+
+const style = aspectRatio ? `aspect-ratio: ${aspectRatio};` : undefined;
+---
+
+<div class:list={['consent-gate', className]} data-consent-gate data-consent-category={category} style={style}>
+	<div class="consent-gate__placeholder" data-consent-gate-placeholder>
+		<p class="consent-gate__title">{title}</p>
+		<p class="consent-gate__message">{message}</p>
+		<button type="button" class="consent-gate__button" data-consent-gate-accept>
+			{acceptText}
+		</button>
+	</div>
+	<template data-consent-gate-content><slot /></template>
+</div>
+
+<script>
+	import { hasConsent, getConsent, setConsent, onConsentChange, type ConsentCategory } from '../../lib/consent';
+
+	function reveal(gate: HTMLElement) {
+		if (gate.dataset.consentGateRevealed) return;
+		gate.dataset.consentGateRevealed = 'true';
+		const template = gate.querySelector<HTMLTemplateElement>('[data-consent-gate-content]');
+		const placeholder = gate.querySelector<HTMLElement>('[data-consent-gate-placeholder]');
+		if (template) {
+			gate.appendChild(template.content.cloneNode(true));
+			template.remove();
+		}
+		placeholder?.remove();
+	}
+
+	function initConsentGates() {
+		document.querySelectorAll<HTMLElement>('[data-consent-gate]').forEach((gate) => {
+			if (gate.dataset.consentGateInit) return;
+			gate.dataset.consentGateInit = 'true';
+
+			const category = (gate.dataset.consentCategory as ConsentCategory | undefined) ?? 'marketing';
+
+			if (hasConsent(category)) {
+				reveal(gate);
+				return;
+			}
+
+			gate.querySelector('[data-consent-gate-accept]')?.addEventListener('click', () => {
+				const current = getConsent()?.categories ?? { analytics: false, marketing: false };
+				setConsent({ ...current, [category]: true });
+				reveal(gate);
+			});
+
+			onConsentChange((state) => {
+				if (state.categories[category]) reveal(gate);
+			});
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', initConsentGates);
+	document.addEventListener('astro:page-load', initConsentGates);
+</script>
+
+<style>
+	.consent-gate {
+		position: relative;
+		display: flex;
+		width: 100%;
+	}
+
+	.consent-gate__placeholder {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: var(--spacing-sm);
+		width: 100%;
+		min-height: 220px;
+		padding: var(--spacing-lg);
+		text-align: center;
+		background-color: var(--color-surface);
+		border: 1px dashed var(--color-border);
+		border-radius: var(--radius-base);
+	}
+
+	.consent-gate__title {
+		margin: 0;
+		font-weight: 600;
+		color: var(--color-text);
+	}
+
+	.consent-gate__message {
+		margin: 0;
+		max-width: 40ch;
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+	}
+
+	.consent-gate__button {
+		padding: 0.6rem 1.25rem;
+		border: none;
+		border-radius: var(--radius-base);
+		background-color: var(--color-primary);
+		color: var(--color-background);
+		font: inherit;
+		font-weight: 600;
+		cursor: pointer;
+	}
+</style>

@@ -1,0 +1,14 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroFeatures from '../../components/hero/HeroFeatures.astro';
+import { ServicesIcon } from '../../components/services';
+import { TeamCompact } from '../../components/team';
+---
+
+<BusinessLayout title="Demo: Stats Hero" description="Demo page combining a stats hero, icon-based services and a compact team row." noindex>
+	<DemoIntro title="Stats Hero + Services Icon + Team Compact" components={['HeroFeatures', 'ServicesIcon', 'TeamCompact']} />
+	<HeroFeatures eyebrow="Track record" height="500px" />
+	<ServicesIcon />
+	<TeamCompact backgroundColor="#eef7ee" />
+</BusinessLayout>

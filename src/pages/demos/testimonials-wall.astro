@@ -1,0 +1,14 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroSplit from '../../components/hero/HeroSplit.astro';
+import { TestimonialsWall } from '../../components/testimonials';
+import { FaqCards } from '../../components/faq';
+---
+
+<BusinessLayout title="Demo: Testimonials Wall" description="Demo page combining a reversed split hero, a testimonials wall and FAQ cards." noindex>
+	<DemoIntro title="Split Hero (reverse) + Testimonials Wall + FAQ Cards" components={['HeroSplit', 'TestimonialsWall', 'FaqCards']} />
+	<HeroSplit reverse height="500px" />
+	<TestimonialsWall />
+	<FaqCards backgroundColor="#f4f6ff" />
+</BusinessLayout>

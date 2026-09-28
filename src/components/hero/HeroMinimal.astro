@@ -1,0 +1,130 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { business } from '../../config/business';
+import { heroContent } from '../../config/heroContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	tag?: string;
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+	highlights?: string[];
+	/** Any valid CSS length (e.g. "auto", "480px", "70vh"). */
+	height?: string;
+}
+
+const {
+	tag = heroContent.minimal.tag,
+	title = business.name,
+	description = business.description,
+	ctaText = heroContent.minimal.ctaText,
+	ctaHref = heroContent.minimal.ctaHref,
+	highlights = heroContent.minimal.highlights,
+	height = heroContent.minimal.height,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--hero-height': height });
+---
+
+<section class="hero-minimal" style={style}>
+	<Container class="hero-minimal__inner">
+		<div class="hero-minimal__accent" aria-hidden="true"></div>
+		{tag && <span class="hero-minimal__tag">{tag}</span>}
+		<h1 class="hero-minimal__title">{title}</h1>
+		<p class="hero-minimal__description">{description}</p>
+		<Button href={ctaHref} variant="link" class="hero-minimal__cta">
+			{ctaText}
+			<Icon name="arrow-right" size={18} class="hero-minimal__cta-icon" />
+		</Button>
+		{highlights.length > 0 && (
+			<ul class="hero-minimal__highlights">
+				{highlights.map((item) => <li>{item}</li>)}
+			</ul>
+		)}
+	</Container>
+</section>
+
+<style>
+	.hero-minimal {
+		width: 100%;
+		min-height: var(--hero-height, auto);
+		display: flex;
+		align-items: center;
+		background-color: var(--color-background);
+	}
+
+	:global(.hero-minimal__inner) {
+		position: relative;
+		max-width: 600px;
+		padding-left: var(--spacing-md);
+	}
+
+	.hero-minimal__accent {
+		position: absolute;
+		top: 0.35rem;
+		left: 0;
+		width: 3px;
+		height: calc(100% - 0.7rem);
+		border-radius: 999px;
+		background-color: var(--color-primary);
+	}
+
+	.hero-minimal__tag {
+		display: inline-block;
+		margin-bottom: var(--spacing-xs);
+		color: var(--color-secondary);
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.hero-minimal__title {
+		font-size: clamp(2rem, 4vw, 2.75rem);
+		line-height: 1.2;
+	}
+
+	.hero-minimal__description {
+		color: var(--color-text-muted);
+	}
+
+	:global(.hero-minimal__cta-icon) {
+		transition: transform 0.2s ease;
+	}
+
+	:global(.hero-minimal__cta:hover .hero-minimal__cta-icon) {
+		transform: translateX(3px);
+	}
+
+	.hero-minimal__highlights {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-xs) var(--spacing-md);
+		list-style: none;
+		margin: var(--spacing-md) 0 0;
+		padding: var(--spacing-sm) 0 0;
+		border-top: 1px solid var(--color-border);
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+	}
+
+	.hero-minimal__highlights li {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.hero-minimal__highlights li::before {
+		content: '';
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background-color: var(--color-primary);
+	}
+</style>

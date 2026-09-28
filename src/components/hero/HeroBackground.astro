@@ -1,0 +1,123 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import { business } from '../../config/business';
+import { heroContent } from '../../config/heroContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import { imageFallbacks } from '../../config/images';
+
+export interface Props extends BackgroundProps {
+	title?: string;
+	description?: string;
+	primaryCtaText?: string;
+	primaryCtaHref?: string;
+	secondaryCtaText?: string;
+	secondaryCtaHref?: string;
+	/** Background image URL. Alias for `backgroundImage`. Falls back to a gradient when omitted. */
+	image?: string;
+	align?: 'left' | 'center';
+	/** Any valid CSS length (e.g. "auto", "480px", "70vh"). */
+	height?: string;
+	/** Set to false to hide the primary CTA button (e.g. on interior page headers where it would just link to the current page). */
+	showbutton?: boolean;
+	/**
+	 * This is a hero — its background image is almost always the page's LCP
+	 * (Largest Contentful Paint) candidate — so this defaults to `true` and
+	 * emits a `<link rel="preload">` for it. A CSS `background-image` (unlike
+	 * an `<img src>`) is only discovered once the browser builds the CSSOM,
+	 * *after* the initial HTML preload scan — this hint tells it to fetch the
+	 * file immediately instead. Set to `false` if this instance isn't the
+	 * page's main hero (e.g. a second `HeroBackground` further down the page).
+	 */
+	priority?: boolean;
+}
+
+const {
+	title = business.name,
+	description = business.tagline,
+	primaryCtaText = heroContent.background.primaryCtaText,
+	primaryCtaHref = heroContent.background.primaryCtaHref,
+	secondaryCtaText,
+	secondaryCtaHref = heroContent.background.secondaryCtaHref,
+	image = imageFallbacks.photo,
+	align = 'left',
+	height = heroContent.background.height,
+	backgroundColor,
+	backgroundImage = image,
+	showbutton = true,
+	priority = true,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage }, { '--hero-height': height });
+---
+
+{priority && backgroundImage && <link rel="preload" as="image" fetchpriority="high" href={backgroundImage} />}
+<section class:list={['hero-bg', `hero-bg--${align}`]} style={style}>
+	<div class="hero-bg__overlay" aria-hidden="true"></div>
+	<Container class="hero-bg__inner">
+		<h1 class="hero-bg__title">{title}</h1>
+		<p class="hero-bg__description">{description}</p>
+		{(showbutton || secondaryCtaText) && (
+			<div class="hero-bg__actions">
+				{showbutton && <Button href={primaryCtaHref} variant="inverse">{primaryCtaText}</Button>}
+				{secondaryCtaText && <Button href={secondaryCtaHref} variant="inverse-outline">{secondaryCtaText}</Button>}
+			</div>
+		)}
+	</Container>
+</section>
+
+<style>
+	.hero-bg {
+		position: relative;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		min-height: var(--hero-height, auto);
+		padding-block: var(--spacing-xl);
+		background-color: var(--color-primary);
+		color: var(--color-background);
+	}
+
+	.hero-bg__overlay {
+		position: absolute;
+		inset: 0;
+		background-color: var(--color-bg-overlay) ;
+	}
+
+	:global(.hero-bg__inner) {
+		position: relative;
+		max-width: 640px;
+	}
+
+	.hero-bg--center {
+		text-align: center;
+		justify-content: center;
+	}
+
+	.hero-bg--center :global(.hero-bg__inner) {
+		margin-inline: auto;
+	}
+
+	.hero-bg--center .hero-bg__actions {
+		justify-content: center;
+	}
+
+	.hero-bg__title {
+		color: var(--color-background);
+		font-size: clamp(2.25rem, 5vw, 3.75rem);
+		line-height: 1.1;
+	}
+
+	.hero-bg__description {
+		color: color-mix(in srgb, var(--color-background) 85%, transparent);
+		font-size: 1.15rem;
+	}
+
+	.hero-bg__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-sm);
+		margin-top: var(--spacing-sm);
+	}
+
+</style>

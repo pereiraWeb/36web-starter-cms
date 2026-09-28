@@ -1,0 +1,63 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardBasic from '../cards/CardBasic.astro';
+import { faqs, faqContent } from '../../config/faqContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = faqContent.cards.eyebrow,
+	title = faqContent.cards.title,
+	description = faqContent.cards.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="faq-cards" style={style}>
+	<Container>
+		<div class="faq-cards__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="faq-cards__list">
+			{faqs.map((faq) => (
+				<li>
+					<CardBasic title={faq.question} description={faq.answer} />
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.faq-cards {
+		background-color: var(--color-surface);
+	}
+
+	.faq-cards__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+	}
+
+
+	.faq-cards__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>

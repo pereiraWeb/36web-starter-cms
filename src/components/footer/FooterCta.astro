@@ -1,0 +1,129 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import AgencyCredit from '../ui/AgencyCredit.astro';
+import BrandMark from '../ui/BrandMark.astro';
+import { business } from '../../config/business';
+import { legalNavigation } from '../../config/navigation';
+import { footerContent } from '../../config/footerContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+
+export interface Props extends BackgroundProps {
+	title?: string;
+	description?: string;
+	ctaText?: string;
+	ctaHref?: string;
+	logo?: string;
+	logoAlt?: string;
+}
+
+const {
+	title = footerContent.cta.title,
+	description = footerContent.cta.description,
+	ctaText = footerContent.cta.ctaText,
+	ctaHref = footerContent.cta.ctaHref,
+	logo = business.logo,
+	logoAlt = business.name,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+const year = new Date().getFullYear();
+---
+
+<footer class="footer-cta">
+	<Container class="footer-cta__banner" style={style}>
+		<div>
+			<h2>{title}</h2>
+			{description && <p>{description}</p>}
+		</div>
+		<Button href={ctaHref} variant="inverse" class="footer-cta__button">{ctaText}</Button>
+	</Container>
+	<Container class="footer-cta__bottom">
+		<div class="footer-cta__brand-group">
+			{logo && (
+				<a href="/" class="footer-cta__brand">
+					<BrandMark logo={logo} logoAlt={logoAlt} class="footer-cta__logo" fallbackToText={false} />
+				</a>
+			)}
+			<p>&copy; {year} {business.legalName}. All rights reserved.</p>
+			<AgencyCredit />
+		</div>
+		<ul>
+			{legalNavigation.map((item) => (
+				<li><a href={item.href}>{item.label}</a></li>
+			))}
+		</ul>
+	</Container>
+</footer>
+
+<style>
+	.footer-cta {
+		border-top: 1px solid var(--color-border);
+	}
+
+	:global(.footer-cta__banner) {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--spacing-md);
+		padding-block: var(--spacing-lg);
+		color: var(--color-background);
+		background-color: var(--color-primary);
+	}
+
+	:global(.footer-cta__banner) h2 {
+		margin: 0 0 0.35rem;
+		color: var(--color-background);
+	}
+
+	:global(.footer-cta__banner) p {
+		margin: 0;
+		color: color-mix(in srgb, var(--color-background) 85%, transparent);
+	}
+
+	:global(.footer-cta__button) {
+		white-space: nowrap;
+	}
+
+	:global(.footer-cta__bottom) {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: var(--spacing-sm);
+		padding-block: var(--spacing-sm);
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+		background-color: var(--color-surface);
+	}
+
+	:global(.footer-cta__bottom) ul {
+		display: flex;
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.footer-cta__brand-group {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-sm);
+	}
+
+	.footer-cta__brand-group p {
+		margin: 0;
+	}
+
+	.footer-cta__brand {
+		display: inline-flex;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `BrandMark` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.footer-cta__logo) {
+		height: 1.75rem;
+		width: auto;
+	}
+</style>

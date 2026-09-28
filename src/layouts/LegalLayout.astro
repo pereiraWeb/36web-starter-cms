@@ -1,0 +1,42 @@
+---
+import BusinessLayout from './BusinessLayout.astro';
+import Breadcrumbs from '../components/ui/Breadcrumbs.astro';
+import Container from '../components/ui/Container.astro';
+import LegalTemplateNotice from '../components/ui/LegalTemplateNotice.astro';
+import { legalPagesContent } from '../config/legalContent';
+import type { SeoProps } from '../lib/seo';
+
+/**
+ * For the legal pages under `src/pages/legal/` — wraps `BusinessLayout` with
+ * the breadcrumb trail, the "incomplete template" warning banner and a
+ * consistent `<h1>` + "last updated" line, so each legal page's `.astro`
+ * file only needs to contain its actual `<h2>` sections (passed as the
+ * default slot).
+ */
+export interface Props extends SeoProps {
+	/** Visible `<h1>`. Defaults to the SEO `title`. */
+	heading?: string;
+	/** Label for the last breadcrumb item. Defaults to `heading`/`title`. */
+	breadcrumbLabel?: string;
+	/** Label for the first, implicit breadcrumb. Defaults to `"Inicio"` (this starter's legal pages ship in Spanish). */
+	homeLabel?: string;
+}
+
+const { heading, breadcrumbLabel, homeLabel = 'Inicio', ...seoProps } = Astro.props;
+const { title } = seoProps;
+const resolvedHeading = heading ?? title;
+---
+
+<BusinessLayout {...seoProps}>
+	<slot name="header" slot="header" />
+	<slot name="footer" slot="footer" />
+	<Breadcrumbs items={[{ label: homeLabel, href: '/' }, { label: breadcrumbLabel ?? resolvedHeading }]} />
+	<section>
+		<Container narrow>
+			<LegalTemplateNotice />
+			<h1>{resolvedHeading}</h1>
+			<p>Última actualización: {legalPagesContent.lastUpdated}</p>
+			<slot />
+		</Container>
+	</section>
+</BusinessLayout>

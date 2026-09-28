@@ -1,0 +1,56 @@
+---
+import Container from '../ui/Container.astro';
+import Breadcrumbs from '../ui/Breadcrumbs.astro';
+
+export interface Props {
+	eyebrow?: string;
+	title: string;
+	components: string[];
+}
+
+const { eyebrow = 'Demo', title, components } = Astro.props;
+---
+
+<Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Demos', href: '/demos' }, { label: title }]} />
+<div class="demo-intro">
+	<Container class="demo-intro__inner">
+		<span class="demo-intro__eyebrow">{eyebrow}</span>
+		<h1 class="demo-intro__title">{title}</h1>
+		<p class="demo-intro__components">Components used: {components.join(' · ')}</p>
+	</Container>
+</div>
+
+<style>
+	.demo-intro {
+		background-color: var(--color-surface);
+		border-bottom: 1px dashed var(--color-border);
+	}
+
+	:global(.demo-intro__inner) {
+		padding-block: var(--spacing-md);
+	}
+
+	.demo-intro__eyebrow {
+		display: inline-block;
+		margin-bottom: 0.4rem;
+		padding: 0.25rem 0.75rem;
+		border-radius: 999px;
+		background-color: var(--color-primary);
+		color: var(--color-background);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+
+	.demo-intro__title {
+		margin: 0 0 0.25rem;
+		font-size: 1.5rem;
+	}
+
+	.demo-intro__components {
+		margin: 0;
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+	}
+</style>

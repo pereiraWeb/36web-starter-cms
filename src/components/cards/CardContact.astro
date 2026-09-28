@@ -1,0 +1,115 @@
+---
+import Icon from '../ui/Icon.astro';
+import { business } from '../../config/business';
+import { contactContent } from '../../config/contactContent';
+
+/**
+ * Reusable card that summarizes the business's contact details (email,
+ * phone, address and opening hours), centered. Reads its labels from
+ * `src/config/contactContent.ts` and its values from `src/config/business.ts`,
+ * so it stays in sync everywhere it's used (e.g. `ContactSplit.astro`).
+ */
+export interface Props {
+	title?: string;
+	showHours?: boolean;
+}
+
+const { title = contactContent.split.title, showHours = true } = Astro.props;
+---
+
+<article class="card-contact">
+	<h3 class="card-contact__title">{title}</h3>
+	<dl class="card-contact__details">
+		<div class="card-contact__row">
+			<dt><Icon name="mail" label={contactContent.split.emailLabel} class="card-contact__icon" /></dt>
+			<dd><a href={`mailto:${business.email}`}>{business.email}</a></dd>
+		</div>
+		<div class="card-contact__row">
+			<dt><Icon name="phone" label={contactContent.split.phoneLabel} class="card-contact__icon" /></dt>
+			<dd><a href={`tel:${business.phone}`}>{business.phone}</a></dd>
+		</div>
+		<div class="card-contact__row">
+			<dt><Icon name="map-pin" label={contactContent.split.addressLabel} class="card-contact__icon" /></dt>
+			<dd>
+				{business.address.street}, {business.address.city}, {business.address.region}{' '}
+				{business.address.postalCode}, {business.address.country}
+			</dd>
+		</div>
+		{showHours && business.hours.length > 0 && (
+			<div class="card-contact__row">
+				<dt><Icon name="clock" label={contactContent.split.hoursLabel} class="card-contact__icon" /></dt>
+				<dd class="card-contact__hours">
+					{business.hours.map((entry) => (
+						<p>
+							{entry.days}: {entry.hours}
+						</p>
+					))}
+				</dd>
+			</div>
+		)}
+	</dl>
+</article>
+
+<style>
+	.card-contact {
+		display: flex;
+		flex-direction: column;
+		flex-shrink: 0;
+		align-items: center;
+		width: 100%;
+		padding: var(--spacing-md);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-base);
+		background-color: var(--color-background);
+		text-align: center;
+	}
+
+	.card-contact__title {
+		margin: 0 0 var(--spacing-sm);
+		font-size: 1.1rem;
+	}
+
+	.card-contact__details {
+		display: grid;
+		width: 100%;
+		max-width: 22rem;
+		gap: 0.6rem;
+		margin: 0;
+	}
+
+	.card-contact__row {
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		gap: 0.5rem;
+		font-size: 0.9rem;
+	}
+
+	.card-contact__row dt {
+		display: flex;
+		flex-shrink: 0;
+		margin: 0.15rem 0 0;
+	}
+
+	:global(.card-contact__icon) {
+		color: var(--color-primary);
+	}
+
+	.card-contact__row dd {
+		margin: 0;
+		text-align: left;
+	}
+
+	.card-contact__row a {
+		color: inherit;
+		text-decoration: underline;
+	}
+
+	.card-contact__hours p {
+		margin: 0;
+	}
+
+	.card-contact__hours p + p {
+		margin-top: 0.2rem;
+	}
+</style>

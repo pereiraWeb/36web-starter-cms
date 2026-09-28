@@ -1,0 +1,22 @@
+---
+import { ServicesShowcase } from '../components/services';
+import { FaqAccordion } from '../components/faq';
+import { faqs } from '../config/faqContent';
+import FaqSchema from '../components/seo/FaqSchema.astro';
+import HeroBackground from '../components/hero/HeroBackground.astro';
+import BusinessLayout from '../layouts/BusinessLayout.astro';
+---
+
+<BusinessLayout title="Services" description="Discover the services we offer.">
+	<HeroBackground
+		align="center"
+		height="360px"
+		title="Services"
+		description="Discover the services we offer."
+		showbutton={false}
+	/>
+	<ServicesShowcase />
+	<FaqAccordion />
+	<!-- Matches the FAQ content rendered visibly above via `FaqAccordion`. -->
+	<FaqSchema items={faqs} />
+</BusinessLayout>

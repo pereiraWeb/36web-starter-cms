@@ -1,0 +1,110 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import CardProfile from '../cards/CardProfile.astro';
+import ResponsiveImage from '../media/ResponsiveImage.astro';
+import { team, teamContent } from '../../config/teamContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import { imageFallbacks } from '../../config/images';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = teamContent.spotlight.eyebrow,
+	title = teamContent.spotlight.title,
+	description = teamContent.spotlight.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const featured = team.find((member) => member.featured) ?? team[0];
+const rest = team.filter((member) => member !== featured);
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="team-spotlight" style={style}>
+	<Container>
+		<div class="team-spotlight__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		{featured && (
+			<div class="team-spotlight__featured">
+				<ResponsiveImage class="team-spotlight__avatar" src={featured.image || imageFallbacks.photo} alt={featured.name} width={96} height={96} />
+				<div>
+					<p class="team-spotlight__name">{featured.name}</p>
+					<p class="team-spotlight__role">{featured.role}</p>
+					{featured.bio && <p class="team-spotlight__bio">{featured.bio}</p>}
+				</div>
+			</div>
+		)}
+		{rest.length > 0 && (
+			<ul class="team-spotlight__list">
+				{rest.map((member) => (
+					<li>
+						<CardProfile name={member.name} role={member.role} bio={member.bio} image={member.image} />
+					</li>
+				))}
+			</ul>
+		)}
+	</Container>
+</section>
+
+<style>
+	.team-spotlight__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+	}
+
+
+	.team-spotlight__featured {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-md);
+		margin-bottom: var(--spacing-lg);
+		padding: var(--spacing-md);
+		border-radius: var(--radius-base);
+		background-color: var(--color-surface);
+	}
+
+	/* :global() because the `<img>` is now rendered by the `ResponsiveImage` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.team-spotlight__avatar) {
+		width: 6rem;
+		height: 6rem;
+		border-radius: 50%;
+		object-fit: cover;
+		flex-shrink: 0;
+	}
+
+	.team-spotlight__name {
+		margin: 0;
+		font-size: 1.25rem;
+		font-weight: bold;
+	}
+
+	.team-spotlight__role {
+		margin: 0;
+		color: var(--color-text-muted);
+	}
+
+	.team-spotlight__bio {
+		margin: var(--spacing-xs) 0 0;
+		color: var(--color-text-muted);
+	}
+
+	.team-spotlight__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: var(--spacing-md);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>

@@ -1,0 +1,92 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import ResponsiveImage from '../media/ResponsiveImage.astro';
+import { team, teamContent } from '../../config/teamContent';
+import { backgroundStyle, type BackgroundProps } from '../../lib/background';
+import { imageFallbacks } from '../../config/images';
+
+export interface Props extends BackgroundProps {
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+}
+
+const {
+	eyebrow = teamContent.compact.eyebrow,
+	title = teamContent.compact.title,
+	description = teamContent.compact.description,
+	backgroundColor,
+	backgroundImage,
+} = Astro.props;
+
+const style = backgroundStyle({ backgroundColor, backgroundImage });
+---
+
+<section class="team-compact" style={style}>
+	<Container>
+		<div class="team-compact__header">
+			<SectionHeading
+				eyebrow={eyebrow}
+				title={title}
+				description={description}
+			/>
+		</div>
+		<ul class="team-compact__row">
+			{team.map((member) => (
+				<li class="team-compact__item">
+					<ResponsiveImage class="team-compact__avatar" src={member.image || imageFallbacks.photo} alt={member.name} width={56} height={56} />
+					<p class="team-compact__name">{member.name}</p>
+					<p class="team-compact__role">{member.role}</p>
+				</li>
+			))}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.team-compact__header {
+		max-width: 640px;
+		margin-bottom: var(--spacing-lg);
+		text-align: center;
+		margin-inline: auto;
+	}
+
+	.team-compact__row {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--spacing-lg);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.team-compact__item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	/* :global() because the `<img>` is now rendered by the `ResponsiveImage` child component, which is outside this component's scoped-CSS boundary. */
+	:global(.team-compact__avatar) {
+		width: 3.5rem;
+		height: 3.5rem;
+		margin-bottom: var(--spacing-xs);
+		border-radius: 50%;
+		object-fit: cover;
+	}
+
+	.team-compact__name {
+		margin: 0;
+		font-weight: bold;
+		font-size: 0.9rem;
+	}
+
+	.team-compact__role {
+		margin: 0;
+		color: var(--color-text-muted);
+		font-size: 0.8rem;
+	}
+</style>

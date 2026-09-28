@@ -1,0 +1,14 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroCentered from '../../components/hero/HeroCentered.astro';
+import { TeamSpotlight } from '../../components/team';
+import { TestimonialsCentered } from '../../components/testimonials';
+---
+
+<BusinessLayout title="Demo: Team Spotlight" description="Demo page combining a centered hero, a spotlighted team member and a centered testimonial." noindex>
+	<DemoIntro title="Centered Hero + Team Spotlight" components={['HeroCentered', 'TeamSpotlight', 'TestimonialsCentered']} />
+	<HeroCentered eyebrow="Meet the team" height="420px" />
+	<TeamSpotlight />
+	<TestimonialsCentered backgroundColor="#fff7ed" />
+</BusinessLayout>

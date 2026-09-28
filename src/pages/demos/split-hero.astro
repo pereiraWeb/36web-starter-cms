@@ -1,0 +1,14 @@
+---
+import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import DemoIntro from '../../components/demo/DemoIntro.astro';
+import HeroSplit from '../../components/hero/HeroSplit.astro';
+import { ServicesSplit } from '../../components/services';
+import { TeamGrid } from '../../components/team';
+---
+
+<BusinessLayout title="Demo: Split Hero" description="Demo page combining a split hero, a services split section and a team grid." noindex>
+	<DemoIntro title="Split Hero + Services Split + Team Grid" components={['HeroSplit', 'ServicesSplit', 'TeamGrid']} />
+	<HeroSplit height="520px" />
+	<ServicesSplit />
+	<TeamGrid backgroundColor="#fdf6ec" />
+</BusinessLayout>
